@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRANAT — Vision Alignment / Выравнивание Видения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&subset=cyrillic,latin&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-void: #F5F3EE; --bg-deep: #FAFAF7; --bg-primary: #FFFDF8;
+  --bg-elevated: #FFFFFF; --bg-surface: #F8F6F1;
+  --bg-glass: rgba(255,255,255,0.6); --bg-glass-hover: rgba(255,255,255,0.8);
+  --crimson: #9B1B30; --crimson-bright: #C41E3A; --crimson-soft: #E57373;
+  --crimson-glow: rgba(155,27,48,0.08); --crimson-dark: #7F1D1D;
+  --gold: #B8860B; --gold-light: #D4AF37; --gold-muted: rgba(184,134,11,0.2);
+  --teal: #00897B; --teal-light: #00897B; --teal-glow: rgba(0,137,123,0.08);
+  --teal-muted: rgba(0,137,123,0.2); --teal-dark: #00695C;
+  --purple: #7B1FA2; --purple-light: #7B1FA2; --purple-glow: rgba(123,31,162,0.08);
+  --purple-muted: rgba(123,31,162,0.2);
+  --coral: #E57373; --coral-glow: rgba(229,115,115,0.1);
+  --text-bright: #2D2A26; --text-primary: #3A3632;
+  --text-secondary: #7A7267; --text-muted: #9C9488;
+  --border-subtle: rgba(0,0,0,0.06); --border-medium: rgba(0,0,0,0.1);
+  --border-crimson: rgba(155,27,48,0.2); --border-teal: rgba(0,137,123,0.2);
+  --border-purple: rgba(123,31,162,0.2);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  font-family:'Inter',-apple-system,sans-serif;
+  background:var(--bg-deep); color:var(--text-primary);
+  background-image:linear-gradient(180deg, #FFFDF8 0%, #FAFAF7 30%, #F5F3EE 100%);
+  background-attachment:fixed;
+  line-height:1.7; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.ru { display:none; }
+body.lang-ru .en { display:none !important; }
+body.lang-ru span.ru { display:inline !important; }
+body.lang-ru div.ru, body.lang-ru p.ru, body.lang-ru li.ru, body.lang-ru td.ru, body.lang-ru th.ru, body.lang-ru h2.ru, body.lang-ru h3.ru, body.lang-ru h4.ru { display:block !important; }
+body.lang-ru tr.ru { display:table-row !important; }
+body.lang-ru thead.ru { display:table-header-group !important; }
+body.lang-ru tbody.ru { display:table-row-group !important; }
+body.lang-ru table.ru { display:table !important; }
+
+.scroll-progress {
+  position:fixed; top:0; left:0; height:2px; z-index:200;
+  background:linear-gradient(90deg, var(--crimson), var(--gold-light), var(--crimson-bright));
+  width:0%; transition:width 0.1s;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:2px; left:0; right:0; z-index:100;
+  padding:0 1.5rem; height:52px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(255,253,248,0.88); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-subtle);
+  box-shadow:0 1px 8px rgba(0,0,0,0.04);
+}
+.nav-brand { display:flex; align-items:center; gap:0.6rem; }
+.nav-wordmark {
+  font-family:'Inter',sans-serif; font-weight:800; font-size:0.8rem;
+  color:var(--text-bright); letter-spacing:2px;
+}
+.nav-wordmark em { font-style:normal; color:var(--crimson); }
+.nav-right { display:flex; align-items:center; gap:1rem; }
+.nav-doc-label {
+  font-size:0.6rem; color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; font-weight:600;
+}
+@media(max-width:600px){ .nav-doc-label{display:none;} }
+.lang-toggle {
+  display:flex; align-items:center; gap:0.2rem;
+  background:rgba(0,0,0,0.03); border:1px solid var(--border-subtle);
+  border-radius:6px; padding:0.15rem;
+}
+.lang-btn {
+  border:none; background:transparent; color:var(--text-muted);
+  font-family:'Inter',sans-serif; font-size:0.6rem; font-weight:700;
+  letter-spacing:0.5px; padding:0.2rem 0.5rem; border-radius:4px;
+  cursor:pointer; transition:all 0.2s;
+}
+.lang-btn.active { background:var(--crimson); color:#fff; }
+.lang-btn:hover:not(.active) { color:var(--text-secondary); background:rgba(0,0,0,0.04); }
+
+/* TABS */
+.tab-bar {
+  position:fixed; top:54px; left:0; right:0; z-index:99;
+  background:rgba(250,250,247,0.94); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border-subtle);
+  box-shadow:0 1px 6px rgba(0,0,0,0.03);
+  display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none; padding:0 1rem;
+}
+.tab-bar::-webkit-scrollbar { display:none; }
+.tab-btn {
+  flex-shrink:0; border:none; background:transparent;
+  color:var(--text-muted); font-family:'Inter',sans-serif;
+  font-size:0.68rem; font-weight:600; letter-spacing:0.3px;
+  padding:0.7rem 1.1rem; cursor:pointer; transition:all 0.25s;
+  border-bottom:2px solid transparent; white-space:nowrap;
+}
+.tab-btn:hover { color:var(--text-secondary); }
+.tab-btn.active { color:var(--crimson); border-bottom-color:var(--crimson); }
+
+/* TAB CONTENT */
+.tab-content { display:none; padding:7.5rem 2rem 4rem; min-height:100vh; }
+.tab-content.active { display:block; }
+.container { max-width:960px; margin:0 auto; }
+
+/* TYPOGRAPHY */
+.section-label {
+  font-size:0.6rem; font-weight:700; letter-spacing:4px;
+  text-transform:uppercase; color:var(--crimson); margin-bottom:0.8rem;
+  display:flex; align-items:center; gap:0.7rem;
+}
+.section-label::before { content:''; width:24px; height:1px; background:var(--crimson); }
+.section-label.red { color:var(--crimson-bright); }
+.section-label.red::before { background:var(--crimson-bright); }
+.section-label.purple { color:var(--purple); }
+.section-label.purple::before { background:var(--purple); }
+.section-label.gold { color:var(--gold); }
+.section-label.gold::before { background:var(--gold); }
+.section-label.coral { color:var(--coral); }
+.section-label.coral::before { background:var(--coral); }
+.section-title {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(1.6rem,3.2vw,2.4rem); font-weight:700;
+  line-height:1.2; color:var(--text-bright); margin-bottom:1rem;
+}
+.section-subtitle {
+  font-size:0.95rem; font-weight:300; color:var(--text-secondary);
+  max-width:640px; line-height:1.8; margin-bottom:2rem;
+}
+
+/* CARDS */
+.card {
+  padding:1.8rem; border-radius:12px;
+  background:var(--bg-glass); border:1px solid var(--border-subtle);
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
+  transition:all 0.3s ease;
+}
+.card:hover { border-color:var(--border-teal); transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.06); }
+.glass-card {
+  padding:1.5rem; border-radius:12px;
+  background:var(--bg-glass); border:1px solid var(--border-subtle);
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
+  transition:all 0.3s ease;
+}
+.glass-card:hover { box-shadow:0 6px 24px rgba(0,0,0,0.06); }
+.card h3 {
+  font-family:'Playfair Display',serif;
+  font-size:1rem; font-weight:700; color:var(--text-bright); margin-bottom:0.5rem;
+}
+.card p { font-size:0.85rem; color:var(--text-secondary); line-height:1.7; }
+.card.teal { border-color:var(--border-teal); }
+.card.teal:hover { box-shadow:0 4px 20px var(--teal-glow); }
+.card.purple { border-color:var(--border-purple); }
+.card.purple:hover { box-shadow:0 4px 20px var(--purple-glow); }
+.card.crimson { border-color:var(--border-crimson); }
+.card.crimson:hover { box-shadow:0 4px 20px var(--crimson-glow); }
+.card-icon {
+  width:40px; height:40px; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; font-size:1.1rem;
+  margin-bottom:0.8rem;
+}
+
+/* GRIDS */
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:1.2rem; margin:1.5rem 0; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin:1.5rem 0; }
+@media(max-width:768px){
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .tab-content { padding:6.5rem 1rem 3rem; }
+  [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+  [style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns:1fr !important; }
+}
+.table-wrap { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+@media(max-width:600px){
+  .data-table { font-size:0.72rem; min-width:500px; }
+  .data-table th, .data-table td { padding:0.4rem 0.5rem; }
+}
+
+/* CALLOUT */
+.callout {
+  padding:1.3rem 1.8rem; border-radius:10px;
+  background:var(--bg-glass); border:1px solid var(--border-subtle);
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 10px rgba(0,0,0,0.025);
+  margin:1.5rem 0; position:relative; overflow:hidden;
+}
+.callout::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
+.callout.teal::before { background:var(--teal); }
+.callout.crimson::before { background:var(--crimson); }
+.callout.gold::before { background:var(--gold); }
+.callout.purple::before { background:var(--purple); }
+.callout h4 {
+  font-size:0.78rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:1px; margin-bottom:0.4rem;
+}
+.callout.teal h4 { color:var(--teal); }
+.callout.crimson h4 { color:var(--crimson); }
+.callout.gold h4 { color:var(--gold); }
+.callout.purple h4 { color:var(--purple); }
+.callout p, .callout li { font-size:0.85rem; color:var(--text-secondary); line-height:1.7; }
+.callout ul { padding-left:1.2rem; margin-top:0.5rem; }
+
+/* QUOTE */
+.quote-block {
+  padding:1.5rem 2rem; margin:1.5rem 0; border-radius:10px;
+  background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(155,27,48,0.04));
+  border-left:3px solid var(--gold-light); font-style:italic;
+  font-family:'Playfair Display',serif; font-size:0.95rem;
+  color:var(--crimson); line-height:1.7;
+}
+.quote-block .attribution {
+  font-family:'Inter',sans-serif; font-style:normal;
+  font-size:0.7rem; color:var(--text-muted); margin-top:0.6rem;
+  letter-spacing:0.5px;
+}
+
+/* TABLES */
+.data-table {
+  width:100%; border-collapse:collapse; margin:1.5rem 0;
+  font-size:0.82rem;
+}
+.data-table th {
+  text-align:left; padding:0.7rem 1rem; font-weight:700;
+  color:var(--crimson); font-size:0.68rem; letter-spacing:1px;
+  text-transform:uppercase; border-bottom:1px solid var(--border-medium);
+  background:rgba(155,27,48,0.04);
+}
+.data-table td {
+  padding:0.65rem 1rem; border-bottom:1px solid var(--border-subtle);
+  color:var(--text-secondary); vertical-align:top;
+}
+.data-table tr:hover td { background:rgba(212,175,55,0.04); }
+
+/* TAGS */
+.tag {
+  display:inline-block; font-size:0.6rem; font-weight:700;
+  letter-spacing:0.5px; padding:0.15rem 0.5rem; border-radius:4px;
+  text-transform:uppercase;
+}
+.tag.decided { background:rgba(0,137,123,0.1); color:var(--teal); border:1px solid var(--teal-muted); }
+.tag.proposed { background:rgba(184,134,11,0.08); color:var(--gold); border:1px solid var(--gold-muted); }
+.tag.aspirational { background:rgba(123,31,162,0.08); color:var(--purple); border:1px solid var(--purple-muted); }
+
+/* PILLAR CARDS */
+.pillar-card {
+  padding:2rem; border-radius:14px; position:relative; overflow:hidden;
+  background:var(--bg-glass); backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
+  transition:all 0.3s;
+}
+.pillar-card .pillar-num {
+  font-family:'Playfair Display',serif; font-size:3rem; font-weight:900;
+  position:absolute; top:0.3rem; right:1rem; opacity:0.06; color:var(--text-bright);
+}
+.pillar-card h3 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700;
+  color:var(--text-bright); margin-bottom:0.6rem;
+}
+.pillar-card p { font-size:0.85rem; color:var(--text-secondary); line-height:1.7; }
+.pillar-card.tech { border:1px solid var(--border-teal); }
+.pillar-card.tech:hover { box-shadow:0 4px 24px var(--teal-glow); }
+.pillar-card.tech h3 { color:var(--teal); }
+.pillar-card.traffic { border:1px solid var(--border-purple); }
+.pillar-card.traffic:hover { box-shadow:0 4px 24px var(--purple-glow); }
+.pillar-card.traffic h3 { color:var(--purple); }
+.pillar-card.economy { border:1px solid var(--gold-muted); }
+.pillar-card.economy:hover { box-shadow:0 4px 24px rgba(212,175,55,0.08); }
+.pillar-card.economy h3 { color:var(--gold); }
+
+/* ACTION ITEMS */
+.action-item {
+  display:flex; gap:0.8rem; padding:0.8rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.action-item:last-child { border-bottom:none; }
+.action-num {
+  flex-shrink:0; width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:800; background:var(--crimson-glow);
+  color:var(--crimson); border:1px solid rgba(155,27,48,0.2);
+}
+.action-body { font-size:0.85rem; color:var(--text-secondary); line-height:1.6; }
+.action-body strong { color:var(--text-bright); }
+
+/* SECTION DIVIDER */
+.divider {
+  height:1px; margin:3rem 0;
+  background:linear-gradient(90deg, transparent, var(--border-medium), transparent);
+}
+
+/* CONFIDENCE */
+.confidence-bar {
+  display:flex; align-items:center; gap:0.6rem; margin:0.3rem 0;
+}
+.confidence-fill {
+  height:6px; border-radius:3px; transition:width 0.5s;
+}
+.confidence-label {
+  font-size:0.7rem; color:var(--text-muted); min-width:100px;
+}
+.confidence-val {
+  font-size:0.65rem; font-weight:700; letter-spacing:0.5px;
+}
+
+/* TREE DIAGRAM */
+.tree-table {
+  width:100%; border-collapse:collapse; margin:1.5rem 0;
+}
+.tree-table td {
+  padding:0.8rem 1rem; border-bottom:1px solid var(--border-subtle);
+  vertical-align:top;
+}
+.tree-table .tree-name {
+  font-weight:700; color:var(--text-bright); font-size:0.88rem;
+  white-space:nowrap;
+}
+.tree-table .tree-source {
+  font-size:0.72rem; color:var(--crimson); font-weight:600;
+  letter-spacing:0.5px;
+}
+.tree-table .tree-meaning {
+  font-size:0.82rem; color:var(--text-secondary); line-height:1.6;
+}
+
+/* BRANCH VIS */
+.branch-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:0.8rem; margin:1.5rem 0; }
+@media(max-width:900px){ .branch-grid{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:600px){ .branch-grid{grid-template-columns:repeat(2,1fr);} }
+.branch-card {
+  padding:1.2rem; border-radius:10px; text-align:center;
+  background:var(--bg-glass); border:1px solid var(--border-subtle);
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 8px rgba(0,0,0,0.025);
+  transition:all 0.3s;
+}
+.branch-card:hover { border-color:var(--border-crimson); box-shadow:0 4px 16px rgba(155,27,48,0.06); }
+.branch-icon { font-size:1.4rem; margin-bottom:0.5rem; }
+.branch-card h4 { font-size:0.78rem; font-weight:700; color:var(--text-bright); margin-bottom:0.3rem; }
+.branch-card p { font-size:0.68rem; color:var(--text-muted); line-height:1.4; }
+
+/* FULL DOC */
+.full-doc h2 {
+  font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700;
+  color:var(--text-bright); margin:2.5rem 0 0.8rem; padding-top:1rem;
+  border-top:1px solid var(--border-subtle);
+}
+.full-doc h3 {
+  font-size:1rem; font-weight:700; color:var(--teal);
+  margin:1.5rem 0 0.5rem;
+}
+.full-doc h4 {
+  font-size:0.9rem; font-weight:700; color:var(--purple);
+  margin:1rem 0 0.4rem;
+}
+.full-doc p { font-size:0.88rem; margin-bottom:0.8rem; }
+.full-doc ul, .full-doc ol { padding-left:1.5rem; margin-bottom:1rem; }
+.full-doc li { font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.3rem; line-height:1.6; }
+.full-doc blockquote {
+  padding:1rem 1.5rem; margin:1rem 0; border-left:3px solid var(--gold-light);
+  background:rgba(212,175,55,0.05); border-radius:0 8px 8px 0;
+  font-style:italic; color:var(--crimson); font-size:0.88rem;
+}
+
+/* PRINT */
+@media print {
+  nav, .tab-bar, .scroll-progress { display:none !important; }
+  .tab-content { display:block !important; padding:2rem 1rem; page-break-before:always; }
+  .tab-content:first-of-type { page-break-before:avoid; }
+  body { background:#fff; color:#2D2A26; background-image:none; }
+  .card, .callout, .pillar-card, .branch-card { border-color:#ddd; background:#fafafa; backdrop-filter:none; box-shadow:none; }
+  .quote-block { background:#faf8f5; }
+}
+
+/* REVEAL ANIMATION */
+.reveal { opacity:0; transform:translateY(16px); transition:opacity 0.6s ease-out, transform 0.6s ease-out; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body class="lang-ru">
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-wordmark">GRAN<em>A</em>T</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-doc-label">
+      <span class="en">Vision Alignment</span>
+      <span class="ru">Выравнивание Видения</span>
+    </span>
+    <div class="lang-toggle">
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn active" data-lang="ru" onclick="setLang('ru')">RU</button>
+    </div>
+  </div>
+</nav>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="vision" onclick="switchTab('vision')">
+    <span class="en">Shared Vision</span><span class="ru">Общее Видение</span>
+  </button>
+  <button class="tab-btn" data-tab="gmt" onclick="switchTab('gmt')">
+    <span class="en">GMT &amp; Olga</span><span class="ru">Ярослав и Ольга</span>
+  </button>
+  <button class="tab-btn" data-tab="alex" onclick="switchTab('alex')">
+    <span class="en">Alex</span><span class="ru">Саша</span>
+  </button>
+  <button class="tab-btn" data-tab="bob" onclick="switchTab('bob')">
+    <span class="en">Bob</span><span class="ru">Лёва</span>
+  </button>
+  <button class="tab-btn" data-tab="ilya" onclick="switchTab('ilya')">
+    <span class="en">Ilya</span><span class="ru">Илья</span>
+  </button>
+  <button class="tab-btn" data-tab="dima" onclick="switchTab('dima')">
+    <span class="en">Dima</span><span class="ru">Дима</span>
+  </button>
+  <button class="tab-btn" data-tab="full" onclick="switchTab('full')">
+    <span class="en">Full Document</span><span class="ru">Полный документ</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 1: SHARED VISION
+     ═══════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-vision">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">Executive Summary</span><span class="ru">Краткая сводка</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">GRANAT: From Voice Artifact to Digital Nation</span>
+    <span class="ru">ГРАНАТ: От голосового артефакта к цифровой нации</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">March 15, 2026 call achieved three critical outcomes: separation of demo from R&D, introduction of Olga as strategic lead, and crystallization of Alex's Three Pillars framework.</span>
+    <span class="ru">Звонок 15 марта 2026 достиг трёх ключевых результатов: разделение демо и R&D, введение Ольги как стратегического лидера, кристаллизация фреймворка «Три Столпа» Саши.</span>
+  </p>
+</div>
+
+<div class="callout teal reveal">
+  <h4>
+    <span class="en">What Granat Is Now</span>
+    <span class="ru">Что такое Гранат сейчас</span>
+  </h4>
+  <p>
+    <span class="en">A voice-based participation platform that uses the human voice as the entry point to a new economic model. People record their voices into a collective song, receive economic rewards (NFT/tokens), and become citizens of a self-governing digital ecosystem. <strong>The song is the door. The economy is the house. The technology is the foundation.</strong></span>
+    <span class="ru">Голосовая платформа участия, использующая человеческий голос как точку входа в новую экономическую модель. Люди записывают свои голоса в коллективную песню, получают экономические вознаграждения (NFT/токены) и становятся гражданами самоуправляемой цифровой экосистемы. <strong>Песня — это дверь. Экономика — это дом. Технология — это фундамент.</strong></span>
+  </p>
+</div>
+
+<div class="callout gold reveal">
+  <h4>
+    <span class="en">Key Shift</span>
+    <span class="ru">Ключевой сдвиг</span>
+  </h4>
+  <p>
+    <span class="en">The demo must not wait for voice aggregation technology to mature. It shows "how life in Granat will work" — the full tree structure, user journey, economic loops — as an interactive architectural plan. Technology R&D runs in parallel, decoupled from presentation timelines.</span>
+    <span class="ru">Демо не должно ждать созревания технологии агрегации голосов. Оно показывает «как будет устроена жизнь в Гранате» — полную структуру дерева, путь пользователя, экономические циклы — как интерактивный архитектурный план. R&D технологии идёт параллельно, отвязанный от сроков презентации.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- THREE PILLARS -->
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">Strategic Framework</span><span class="ru">Стратегический фреймворк</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">The Three Pillars</span>
+    <span class="ru">Три Столпа</span>
+  </h2>
+  <p class="section-subtitle">
+    <span class="en">Alex Berezovsky's foundational operating structure. Unanimous agreement from all participants.</span>
+    <span class="ru">Операционная структура Саши Березовского. Единогласное согласие всех участников.</span>
+  </p>
+</div>
+
+<div class="grid-3 reveal">
+  <div class="pillar-card tech">
+    <div class="pillar-num">1</div>
+    <div class="card-icon" style="background:var(--teal-glow);border:1px solid var(--teal-muted);">&#9881;</div>
+    <h3><span class="en">Technology</span><span class="ru">Технология</span></h3>
+    <p>
+      <span class="en">Sound as parametric acoustic events, not wave signals. Three parallel pipelines. April target for good audio quality. 🆕 AB Manifesto (March 17): phase policy + cluster reduction + edge resynthesis + protocol standard.</span>
+      <span class="ru">Звук как параметрические акустические события, не волновой сигнал. Три параллельных пайплайна. Цель на апрель — хорошее качество аудио. 🆕 Манифест АБ (17 марта): фазовая политика + кластерная редукция + ресинтез на клиенте + стандарт протокола.</span>
+    </p>
+    <div style="margin-top:0.8rem;"><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></div>
+  </div>
+  <div class="pillar-card traffic">
+    <div class="pillar-num">2</div>
+    <div class="card-icon" style="background:var(--purple-glow);border:1px solid var(--purple-muted);">&#9733;</div>
+    <h3><span class="en">Traffic</span><span class="ru">Трафик</span></h3>
+    <p>
+      <span class="en">Influencer-first acquisition. 100M users via leaders, 900M via tail effect. Seven Captains for seven life domains. Not institutional — viral.</span>
+      <span class="ru">Привлечение через инфлюенсеров. 100M пользователей через лидеров, 900M через хвостовой эффект. Семь Капитанов для семи сфер жизни. Не институциональный — вирусный.</span>
+    </p>
+    <div style="margin-top:0.8rem;"><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></div>
+  </div>
+  <div class="pillar-card economy">
+    <div class="pillar-num">3</div>
+    <div class="card-icon" style="background:rgba(212,168,67,0.1);border:1px solid var(--gold-muted);">&#9830;</div>
+    <h3><span class="en">Economy</span><span class="ru">Экономика</span></h3>
+    <p>
+      <span class="en">Universal Participation Income. No one-way streets: give voice, receive NFT/token immediately. Acoustic passport as identity. Leagues, governance, growth.</span>
+      <span class="ru">Универсальный Доход от Участия. Никаких односторонних дорог: отдаёшь голос — получаешь NFT/токен сразу. Акустический паспорт как идентификация. Лиги, управление, рост.</span>
+    </p>
+    <div style="margin-top:0.8rem;"><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></div>
+  </div>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">"Гранат — страна со своей экономикой и взаимодействием. Акустический паспорт, создание экономической деятельности."</span>
+  <span class="en">"Granat is a country with its own economy and interaction. Acoustic passport, creation of economic activity."</span>
+  <div class="attribution">— Alex Berezovsky</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- THE TREE -->
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">The Tree Concept</span><span class="ru">Концепция Древа</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Five Trees, One Structure</span>
+    <span class="ru">Пять Древ, одна структура</span>
+  </h2>
+</div>
+
+<table class="tree-table reveal">
+  <tr>
+    <td class="tree-name"><span class="en">Tree of Sephirot</span><span class="ru">Древо Сфирот</span></td>
+    <td class="tree-source">OA, GMT</td>
+    <td class="tree-meaning">
+      <span class="en">10 spheres of correct interaction. If planted in right soil with right nourishment, it bears fruit. The template for proper interaction between all elements.</span>
+      <span class="ru">10 сфер правильного взаимодействия. Если посажено в правильную почву с правильным питанием, оно приносит плоды. Шаблон правильного взаимодействия между всеми элементами.</span>
+    </td>
+  </tr>
+  <tr>
+    <td class="tree-name">Yggdrasil</td>
+    <td class="tree-source">Dima</td>
+    <td class="tree-meaning">
+      <span class="en">The World Tree where the crown equals the roots. Everything is connected. What is above mirrors what is below.</span>
+      <span class="ru">Мировое Древо, где крона равна корням. Всё связано. Что наверху — отражает то, что внизу.</span>
+    </td>
+  </tr>
+  <tr>
+    <td class="tree-name">Merkle Tree</td>
+    <td class="tree-source">AB</td>
+    <td class="tree-meaning">
+      <span class="en">Cryptographic data structure for verification — the technical tree that ensures bit-for-bit reproducibility.</span>
+      <span class="ru">Криптографическая структура данных для верификации — техническое дерево, обеспечивающее воспроизводимость бит-в-бит.</span>
+    </td>
+  </tr>
+  <tr>
+    <td class="tree-name"><span class="en">Barabasi-Albert Graph</span><span class="ru">Граф Барабаши-Альберта</span></td>
+    <td class="tree-source">AB</td>
+    <td class="tree-meaning">
+      <span class="en">Scale-free network: thick nodes attract more connections. Each influencer is a node; the biggest attract the most participants.</span>
+      <span class="ru">Безмасштабная сеть: толстые узлы притягивают больше связей. Каждый инфлюенсер — узел; крупнейшие притягивают больше всех участников.</span>
+    </td>
+  </tr>
+  <tr>
+    <td class="tree-name"><span class="en">Tree of Knowledge &rarr; Tree of Life</span><span class="ru">Древо Познания &rarr; Древо Жизни</span></td>
+    <td class="tree-source">GMT</td>
+    <td class="tree-meaning">
+      <span class="en">Granat's spiritual arc: from knowledge (technology) to life (functioning ecosystem). The pomegranate returns from the Tree of Knowledge to the Tree of Life.</span>
+      <span class="ru">Духовная арка Граната: от познания (технология) к жизни (работающая экосистема). Гранат возвращается от Древа Познания к Древу Жизни.</span>
+    </td>
+  </tr>
+</table>
+
+<div class="divider"></div>
+
+<!-- PLATFORM BRANCHES -->
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">Platform Structure</span><span class="ru">Структура платформы</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">The Branches of Granat</span>
+    <span class="ru">Ветви Граната</span>
+  </h2>
+</div>
+
+<div class="branch-grid reveal">
+  <div class="branch-card" style="border-color:var(--border-crimson);">
+    <div class="branch-icon">&#127926;</div>
+    <h4><span class="en">Artifact</span><span class="ru">Артефакт</span></h4>
+    <p><span class="en">The Song. 1B voices. Recording, playback, listening modes.</span><span class="ru">Песня. 1 млрд голосов. Запись, воспроизведение, режимы прослушивания.</span></p>
+  </div>
+  <div class="branch-card" style="border-color:var(--border-teal);">
+    <div class="branch-icon">&#127908;</div>
+    <h4><span class="en">Voice</span><span class="ru">Голос</span></h4>
+    <p><span class="en">12-parameter fingerprint. Acoustic passport. Voice-based identity.</span><span class="ru">12-параметровый отпечаток. Акустический паспорт. Голосовая идентификация.</span></p>
+  </div>
+  <div class="branch-card" style="border-color:var(--gold-muted);">
+    <div class="branch-icon">&#9830;</div>
+    <h4><span class="en">Economy</span><span class="ru">Экономика</span></h4>
+    <p><span class="en">UPI, NFT/GRT tokens, leagues, DDL governance.</span><span class="ru">UPI, NFT/GRT токены, лиги, DDL управление.</span></p>
+  </div>
+  <div class="branch-card" style="border-color:var(--border-purple);">
+    <div class="branch-icon">&#127758;</div>
+    <h4><span class="en">Community</span><span class="ru">Сообщество</span></h4>
+    <p><span class="en">GranatFest, captains, leagues, offline activation.</span><span class="ru">GranatFest, капитаны, лиги, оффлайн-активация.</span></p>
+  </div>
+  <div class="branch-card" style="border-color:var(--border-subtle);">
+    <div class="branch-icon">&#9881;</div>
+    <h4><span class="en">Under the Hood</span><span class="ru">Под капотом</span></h4>
+    <p><span class="en">3 pipelines, BLAKE3, TON blockchain, ASIC vision.</span><span class="ru">3 пайплайна, BLAKE3, TON блокчейн, ASIC-видение.</span></p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- KEY DECISIONS -->
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">Key Decisions</span><span class="ru">Ключевые решения</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">What Was Decided on March 15</span>
+    <span class="ru">Что было решено 15 марта</span>
+  </h2>
+</div>
+
+<table class="data-table reveal">
+  <thead>
+    <tr>
+      <th><span class="en">Decision</span><span class="ru">Решение</span></th>
+      <th><span class="en">Champions</span><span class="ru">Ответственные</span></th>
+      <th><span class="en">Status</span><span class="ru">Статус</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <span class="en">Demo and voice technology R&D are separate tracks</span>
+        <span class="ru">Демо и R&D технологии голоса — отдельные треки</span>
+      </td>
+      <td><span class="en">All</span><span class="ru">Все</span></td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="en">Three Pillars (Technology, Traffic, Economy) as operating structure</span>
+        <span class="ru">Три Столпа (Технология, Трафик, Экономика) как операционная структура</span>
+      </td>
+      <td>AB</td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="en">Olga as strategic/offline lead while GMT enters studio</span>
+        <span class="ru">Ольга как стратег/оффлайн-лидер, пока GMT в студии</span>
+      </td>
+      <td>GMT, OA</td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="en">Influencer-first go-to-market (not institutional/FIFA-dependent)</span>
+        <span class="ru">GTM через инфлюенсеров (не институциональный, не зависящий от FIFA)</span>
+      </td>
+      <td>OA</td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="en">Demo as first product — building blocks toward MVP</span>
+        <span class="ru">Демо как первый продукт — строительные блоки к MVP</span>
+      </td>
+      <td>OA, Dima</td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="divider"></div>
+
+<!-- CONFIDENCE -->
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">Confidence Assessment</span><span class="ru">Оценка уверенности</span>
+  </div>
+  <h2 class="section-title" style="margin-bottom:1.5rem;">
+    <span class="en">Where We Stand</span>
+    <span class="ru">Где мы сейчас</span>
+  </h2>
+</div>
+
+<div class="reveal" style="max-width:700px;">
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">Strategic direction</span><span class="ru">Стратегия</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:92%;background:var(--teal);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--teal);"><span class="en">HIGH</span><span class="ru">ВЫСОКАЯ</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">Demo as sep. track</span><span class="ru">Демо отдельно</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:92%;background:var(--teal);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--teal);"><span class="en">HIGH</span><span class="ru">ВЫСОКАЯ</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">Influencer GTM</span><span class="ru">GTM инфлюенсеры</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:78%;background:var(--gold);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--gold);"><span class="en">MED-HIGH</span><span class="ru">СРЕДНЕ-ВЫС</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">April tech target</span><span class="ru">Техн. цель апрель</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:60%;background:var(--gold);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--gold);"><span class="en">MEDIUM</span><span class="ru">СРЕДНЯЯ</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">Economic model</span><span class="ru">Эконом. модель</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:55%;background:var(--gold);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--gold);"><span class="en">MEDIUM</span><span class="ru">СРЕДНЯЯ</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">Offline events</span><span class="ru">Оффлайн</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:25%;background:var(--crimson-bright);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--crimson-bright);"><span class="en">LOW</span><span class="ru">НИЗКАЯ</span></span>
+  </div>
+  <div class="confidence-bar">
+    <span class="confidence-label"><span class="en">1B voices at scale</span><span class="ru">1 млрд голосов</span></span>
+    <div style="flex:1;background:var(--bg-glass);border-radius:3px;height:6px;overflow:hidden;">
+      <div class="confidence-fill" style="width:20%;background:var(--crimson-bright);"></div>
+    </div>
+    <span class="confidence-val" style="color:var(--crimson-bright);"><span class="en">LOW</span><span class="ru">НИЗКАЯ</span></span>
+  </div>
+</div>
+
+<div class="callout teal reveal" style="margin-top:2rem;">
+  <h4>
+    <span class="en">Your Personal Tab</span>
+    <span class="ru">Ваша персональная вкладка</span>
+  </h4>
+  <p>
+    <span class="en">Click your name in the tab bar above to see what the March 15 decisions mean for you specifically: your action items, your open questions, and the details most relevant to your role.</span>
+    <span class="ru">Нажмите на своё имя во вкладках наверху, чтобы увидеть, что решения 15 марта означают именно для вас: ваши задачи, ваши открытые вопросы и детали, наиболее релевантные для вашей роли.</span>
+  </p>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 2: GMT & OLGA
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-gmt">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">For GMT &amp; Olga</span><span class="ru">Для Ярослава и Ольги</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">Your Vision, Our Execution</span>
+    <span class="ru">Ваше видение, наше исполнение</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">Everything from March 15 that matters for the two of you — the tree, the demo direction, the new colors, and your next steps.</span>
+    <span class="ru">Всё с 15 марта, что важно для вас двоих — дерево, направление демо, новые цвета и ваши следующие шаги.</span>
+  </p>
+</div>
+
+<!-- WHAT THEY ASKED FOR -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">What You Asked For</span>
+    <span class="ru">Что вы запросили</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card crimson">
+    <h3><span class="en">GMT: "Draw me the tree"</span><span class="ru">GMT: «Нарисуйте мне это дерево»</span></h3>
+    <p>
+      <span class="en">A navigable, hierarchical representation of the full Granat platform. Something to show to the people who "run world processes." Not technology — the complete picture of how life in Granat works.</span>
+      <span class="ru">Навигируемое, иерархическое представление всей платформы Гранат. То, что можно показать людям, которые «управляют мировыми процессами». Не технология — полная картина того, как устроена жизнь в Гранате.</span>
+    </p>
+  </div>
+  <div class="card teal">
+    <h3><span class="en">Olga: Decouple, Structure, UX</span><span class="ru">Ольга: Разделить, структурировать, UX</span></h3>
+    <p>
+      <span class="en">Separate the demo from technology R&D. Build incrementally with "cubes" — active ones for working features, inactive for "coming after." No vinaigrette. Clear user journey from entry to growth.</span>
+      <span class="ru">Отделить демо от технологического R&D. Строить поэтапно «кубиками» — активные для работающих функций, неактивные для «будет позже». Никакого винегрета. Чёткий путь пользователя от входа до роста.</span>
+    </p>
+  </div>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">"Нарисуйте мне, пожалуйста, это дерево, чтобы оно было в концепте презентации. И дальше делайте, что хотите."</span>
+  <span class="en">"Draw me this tree so it's in the presentation concept. And then do whatever you want."</span>
+  <div class="attribution">— GMT</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- WHAT THEY'LL SEE -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">What You'll See in the Demo</span>
+    <span class="ru">Что вы увидите в демо</span>
+  </h2>
+</div>
+
+<div class="grid-3 reveal">
+  <div class="card">
+    <h3><span class="en">The Full Tree</span><span class="ru">Полное Древо</span></h3>
+    <p>
+      <span class="en">Hierarchical, navigable structure of all Granat branches — Artifact, Voice, Economy, Community, Technology. Click to explore any branch.</span>
+      <span class="ru">Иерархическая, навигируемая структура всех ветвей Граната — Артефакт, Голос, Экономика, Сообщество, Технология. Кликайте, чтобы исследовать любую ветвь.</span>
+    </p>
+  </div>
+  <div class="card">
+    <h3><span class="en">Interactive Manifesto</span><span class="ru">Интерактивный манифест</span></h3>
+    <p>
+      <span class="en">The manifesto evolves into a navigable product presentation. Active cubes = done. Inactive cubes = coming next. A living document that fills in as we build.</span>
+      <span class="ru">Манифест превращается в навигируемую продуктовую презентацию. Активные кубики = готово. Неактивные = будет дальше. Живой документ, который заполняется по мере построения.</span>
+    </p>
+  </div>
+  <div class="card">
+    <h3><span class="en">Brighter Colors</span><span class="ru">Яркие цвета</span></h3>
+    <p>
+      <span class="en">New direction: dark premium base with vibrant teal, purple, and coral accents. Life-affirming, inviting, celebratory — matching the energy of world-class events.</span>
+      <span class="ru">Новое направление: тёмная премиальная база с яркими бирюзовыми, пурпурными и коралловыми акцентами. Жизнерадостные, призывающие, праздничные — на уровне энергии мировых мероприятий.</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COLOR DIRECTION -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Color Direction</span>
+    <span class="ru">Цветовое направление</span>
+  </h2>
+</div>
+
+<div class="callout gold reveal">
+  <h4><span class="en">Your Feedback</span><span class="ru">Ваш отзыв</span></h4>
+  <p>
+    <span class="en">"Life-affirming, bright, inviting." Not white, but bright tones — light purple, turquoise, cyan. Reference: Sembly (AI tool) — "great colors, purple and turquoise, knows how to attract attention." FIFA events are always bright.</span>
+    <span class="ru">«Жизнерадостный, яркий, призывающий.» Не белый, но яркие тона в восприятии — светло-фиолетовый, бирюзовый, голубой. Ориентир: Sembly (AI-инструмент) — «отличные цвета, фиолетовый и бирюзовый, умеют привлечь внимание.» Мероприятия FIFA всегда яркие.</span>
+  </p>
+</div>
+
+<div class="grid-2 reveal" style="margin-top:1rem;">
+  <div class="card" style="text-align:center;">
+    <h3><span class="en">Base Palette (kept)</span><span class="ru">Базовая палитра (сохранена)</span></h3>
+    <div style="display:flex;gap:0.5rem;justify-content:center;margin:1rem 0;">
+      <div style="width:40px;height:40px;border-radius:8px;background:#0C0C0C;border:1px solid var(--border-medium);"></div>
+      <div style="width:40px;height:40px;border-radius:8px;background:#C62828;"></div>
+      <div style="width:40px;height:40px;border-radius:8px;background:#D4A843;"></div>
+    </div>
+    <p style="font-size:0.75rem;"><span class="en">Dark, Ruby, Gold — premium anchor</span><span class="ru">Тёмный, рубиновый, золотой — премиальный якорь</span></p>
+  </div>
+  <div class="card" style="text-align:center;border-color:var(--border-teal);">
+    <h3><span class="en">New Accents (added)</span><span class="ru">Новые акценты (добавлены)</span></h3>
+    <div style="display:flex;gap:0.5rem;justify-content:center;margin:1rem 0;">
+      <div style="width:40px;height:40px;border-radius:8px;background:#00BFA5;"></div>
+      <div style="width:40px;height:40px;border-radius:8px;background:#9C27B0;"></div>
+      <div style="width:40px;height:40px;border-radius:8px;background:#26C6DA;"></div>
+      <div style="width:40px;height:40px;border-radius:8px;background:#FF7043;"></div>
+    </div>
+    <p style="font-size:0.75rem;"><span class="en">Teal, Purple, Cyan, Coral — vibrant highlights</span><span class="ru">Бирюзовый, фиолетовый, голубой, коралловый — яркие акценты</span></p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ACTION ITEMS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Action Items</span>
+    <span class="ru">Ваши задачи</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <strong>GMT:</strong>
+      <span class="en">Enter studio. Create music. Enjoy the process. The team builds the tree while you're in the studio.</span>
+      <span class="ru">Войти в студию. Создавать музыку. Наслаждаться процессом. Команда строит дерево, пока вы в студии.</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <strong>GMT:</strong>
+      <span class="en">✅ Connect with Ilya Lukashev — done! Call scheduled today at 16:30 CET. Thank you!</span>
+      <span class="ru">✅ Связь с Ильёй Лукашевым — готово! Звонок сегодня в 16:30 CET. Спасибо!</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">3</div>
+    <div class="action-body">
+      <strong><span class="en">Olga:</span><span class="ru">Ольга:</span></strong>
+      <span class="en">I'll be sending intermediate demo versions 2-3 times a week. Your feedback is the compass — the faster you react, the faster we converge on the right direction. Whenever convenient for you!</span>
+      <span class="ru">Буду отправлять промежуточные версии демо 2-3 раза в неделю. Ваша обратная связь — компас: чем быстрее реакция, тем быстрее мы сходимся к правильному направлению. Когда вам удобно!</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">4</div>
+    <div class="action-body">
+      <strong><span class="en">Olga:</span><span class="ru">Ольга:</span></strong>
+      <span class="en">Hold offline event planning until April technology milestone. Then: partners, dates, travel schedules.</span>
+      <span class="ru">Отложить планирование оффлайн-мероприятий до технологического рубежа в апреле. Потом: партнёры, даты, расписания.</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OPEN QUESTIONS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Open Questions for You</span>
+    <span class="ru">Открытые вопросы для вас</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="callout purple">
+    <p>
+      <span class="en"><strong>Color palette finalization:</strong> "Brighter, more life-affirming" was agreed but no specific palette finalized. This document is the first taste of the proposed direction. Your feedback welcome.</span>
+      <span class="ru"><strong>Финализация палитры:</strong> «Ярче, жизнерадостнее» — согласовано, но конкретная палитра не утверждена. Этот документ — первый вкус предложенного направления. Ждём вашего отзыва.</span>
+    </p>
+  </div>
+  <div class="callout purple">
+    <p>
+      <span class="en"><strong>Voice recording in demo:</strong> GMT wants functional recording; Olga says placeholder is fine. I proposed a middle ground: record but don't aggregate real-time. Need your final call on this.</span>
+      <span class="ru"><strong>Запись голоса в демо:</strong> GMT хочет работающую запись; Ольга говорит, что заглушка подойдёт. Я предложил компромисс: записывать, но не агрегировать в реальном времени. Нужно ваше финальное решение.</span>
+    </p>
+  </div>
+  <div class="callout purple">
+    <p>
+      <span class="en"><strong>Target audience for demo:</strong> GMT references "people who run world processes" — can we know the industry or psychological portrait to better target the demo?</span>
+      <span class="ru"><strong>Целевая аудитория демо:</strong> GMT упоминает «людей, которые управляют мировыми процессами» — можем ли мы узнать индустрию или психологический портрет для лучшей настройки демо?</span>
+    </p>
+  </div>
+</div>
+
+<div class="quote-block reveal" style="margin-top:2rem;border-left-color:var(--gold);">
+  <span class="ru">"Пока Вы в студии — мы строим это Древо."</span>
+  <span class="en">"While you're in the studio — we're building this Tree."</span>
+  <div class="attribution">— Dima</div>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 3: ALEX
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-alex">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">For Alex Berezovsky</span><span class="ru">Для Саши Березовского</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">Framework, Economy, Architecture</span>
+    <span class="ru">Фреймворк, экономика, архитектура</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">Your Three Pillars became the backbone. Here's the full detail on each, plus your idea inventory and open questions.</span>
+    <span class="ru">Ваши Три Столпа стали хребтом. Вот полные детали по каждому, плюс инвентаризация идей и открытые вопросы.</span>
+  </p>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">"Демо должно дать полное представление того, как там будет жить."</span>
+  <span class="en">"The demo must give a complete representation of how life there will work."</span>
+  <div class="attribution">— Alex Berezovsky</div>
+</div>
+
+<div class="quote-block reveal" style="border-left-color:var(--teal);">
+  <span class="ru">"GRANAT — не технология сжатия звука, это инфраструктура доверия для новой аудиоэкономики."</span>
+  <span class="en">"GRANAT is not compression technology — it's trust infrastructure for a new audio economy."</span>
+  <div class="attribution">— Alex Berezovsky, <span class="en">Manifesto (March 17, 2026)</span><span class="ru">Манифест (17 марта 2026)</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- THREE PILLARS DETAIL -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Three Pillars — Full Detail</span>
+    <span class="ru">Три Столпа — полные детали</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="pillar-card tech" style="margin-bottom:1.2rem;">
+    <div class="pillar-num">1</div>
+    <h3><span class="en">Pillar 1: Technology</span><span class="ru">Столп 1: Технология</span></h3>
+    <p>
+      <span class="en">No existing codec handles peer-to-many voice aggregation at scale. All existing tools are peer-to-peer. Going from 1 to 10 is possible; from 10 to 1,000 is hard; 1,000 to 1,000,000 is "absurd" by current standards; 1 billion is the strategic target.</span>
+      <span class="ru">Ни один существующий кодек не обрабатывает агрегацию голосов peer-to-many в масштабе. Все существующие инструменты — peer-to-peer. От 1 до 10 — возможно; от 10 до 1000 — сложно; от 1000 до 1 000 000 — «абсурдно» по текущим стандартам; 1 миллиард — стратегическая цель.</span>
+    </p>
+    <ul style="margin-top:0.8rem;padding-left:1.2rem;">
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.3rem;">
+        <span class="en">Aggregate deterministically (bit-for-bit reproducible)</span>
+        <span class="ru">Агрегировать детерминированно (воспроизводимо бит-в-бит)</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.3rem;">
+        <span class="en">Store for 100 years without loss, at minimal cost</span>
+        <span class="ru">Хранить 100 лет без потерь, при минимальных затратах</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.3rem;">
+        <span class="en">Reproducible from a single device</span>
+        <span class="ru">Воспроизводимо с одного устройства</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.3rem;">
+        <span class="en">Scale from 1 to 1 billion without changing the fundamental algorithm</span>
+        <span class="ru">Масштабирование от 1 до 1 миллиарда без изменения фундаментального алгоритма</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- AB Manifesto additions — March 17, 2026 -->
+  <div class="callout teal reveal" style="margin-bottom:1.5rem;">
+    <h4><span class="en">🆕 AB Manifesto (March 17, 2026)</span><span class="ru">🆕 Манифест АБ (17 марта 2026)</span></h4>
+    <p style="margin-bottom:0.8rem;">
+      <span class="en">Alex formalized the technology vision in a manifesto document. Key additions to Pillar 1:</span>
+      <span class="ru">Саша формализовал технологическое видение в документе-манифесте. Ключевые дополнения к Столпу 1:</span>
+    </p>
+    <ul style="padding-left:1.2rem;">
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Acoustic events paradigm</span><span class="ru">Парадигма акустических событий</span></strong>
+        <span class="en"> — Sound stored as compact parametric events (frequency, partials, amplitudes, phase, aperiodics), NOT as wave signals. 10-100x smaller than PCM. This is not compression — it's a new representation format.</span>
+        <span class="ru"> — Звук хранится как компактные параметрические события (частота, парциалы, амплитуды, фаза, апериодика), НЕ как волновой сигнал. В 10-100 раз меньше PCM. Это не сжатие — это новый формат представления.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Phase interference solution</span><span class="ru">Решение фазовой интерференции</span></strong>
+        <span class="en"> — Phase policy + cluster reduction + protective aggregator. This is the named mechanism that preserves acoustic field and natural sound quality at scale.</span>
+        <span class="ru"> — Фазовая политика + кластерная редукция + защитный агрегатор. Именованный механизм, сохраняющий акустическое поле и естественность звучания при масштабировании.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Edge/client resynthesis</span><span class="ru">Ресинтез на устройстве клиента</span></strong>
+        <span class="en"> — Resynthesis happens on the user's device, not servers. Massive scalability and cost reduction.</span>
+        <span class="ru"> — Ресинтез происходит на устройстве пользователя, не на серверах. Массивное масштабирование и снижение затрат.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Privacy by design</span><span class="ru">Приватность по умолчанию</span></strong>
+        <span class="en"> — Aperiodic voice component (neural signature) is encoded and optionally anonymized. GDPR/biometric compliance built in.</span>
+        <span class="ru"> — Апериодическая составляющая голоса (нейронная подпись) кодируется и опционально анонимизируется. Соответствие GDPR/биометрии встроено.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Legal reproducibility</span><span class="ru">Юридическая воспроизводимость</span></strong>
+        <span class="en"> — Not just technical determinism — legally defensible reproducibility of results.</span>
+        <span class="ru"> — Не просто техническая детерминированность — юридически защитимая воспроизводимость результатов.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:0.5rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Expanded verticals</span><span class="ru">Расширенные вертикали</span></strong>
+        <span class="en"> — Beyond music: gaming, metaverse, telecom, streaming, education, social platforms. Granat is infrastructure, not just a music app.</span>
+        <span class="ru"> — За пределами музыки: игры, метавселенная, телеком, стриминг, образование, социальные платформы. Гранат — инфраструктура, не просто музыкальное приложение.</span>
+      </li>
+      <li style="color:var(--text-secondary);font-size:0.85rem;">
+        <strong style="color:var(--text-primary);"><span class="en">Positioning</span><span class="ru">Позиционирование</span></strong>
+        <span class="en"> — "Not compression technology — trust infrastructure for a new audio economy." Granat as protocol standard, not just a product.</span>
+        <span class="ru"> — «Не технология сжатия звука — инфраструктура доверия для новой аудиоэкономики.» Гранат как стандарт протокола, а не просто продукт.</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pillar-card traffic" style="margin-bottom:1.2rem;">
+    <div class="pillar-num">2</div>
+    <h3><span class="en">Pillar 2: Traffic</span><span class="ru">Столп 2: Трафик</span></h3>
+    <p>
+      <span class="en">Influencers, not institutions. 100M unique users via leaders leads to 900M via tail effect. Seven Captains for seven domains. Each captain is a node in a Barabasi-Albert scale-free network — the thickest nodes attract the most participants.</span>
+      <span class="ru">Инфлюенсеры, а не институции. 100M уникальных пользователей через лидеров ведут к 900M через хвостовой эффект. Семь Капитанов для семи доменов. Каждый капитан — узел в безмасштабной сети Барабаши-Альберта — толстые узлы привлекают больше участников.</span>
+    </p>
+  </div>
+
+  <div class="pillar-card economy">
+    <div class="pillar-num">3</div>
+    <h3><span class="en">Pillar 3: Economy</span><span class="ru">Столп 3: Экономика</span></h3>
+    <p>
+      <span class="en">Technology brings people in. Traffic brings people in. Economy keeps them. Without economy, "Neo flies away and everyone goes home."</span>
+      <span class="ru">Технология приводит людей. Трафик приводит людей. Экономика удерживает их. Без экономики «Нео улетает, и все расходятся по домам.»</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ECONOMIC MODEL -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Economic Model</span>
+    <span class="ru">Экономическая модель</span>
+  </h2>
+</div>
+
+<table class="data-table reveal">
+  <thead>
+    <tr>
+      <th><span class="en">Element</span><span class="ru">Элемент</span></th>
+      <th><span class="en">Type</span><span class="ru">Тип</span></th>
+      <th><span class="en">Purpose</span><span class="ru">Назначение</span></th>
+      <th><span class="en">Status</span><span class="ru">Статус</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>GVP</strong> (Granat Voice Proof)</td>
+      <td>TIP-4 NFT / TON</td>
+      <td><span class="en">Per-contribution proof-of-existence; not a financial asset — a fact receipt</span><span class="ru">Подтверждение существования вклада; не финансовый актив — квитанция факта</span></td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td><strong>GRT</strong> (Granat Resident Token)</td>
+      <td>TIP-3 utility / TON</td>
+      <td><span class="en">Licensing, staking, choir launching; staking increases UPI weight</span><span class="ru">Лицензирование, стейкинг, запуск хоров; стейкинг увеличивает вес UPI</span></td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td><strong>PDM</strong> (Participation Deposit)</td>
+      <td>~$2 <span class="en">refundable</span><span class="ru">возвратный</span></td>
+      <td><span class="en">Anti-Sybil: makes mass-farming cost-prohibitive</span><span class="ru">Анти-Сибил: делает массовый фарминг невыгодным</span></td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td><strong>UPI</strong></td>
+      <td><span class="en">Income model</span><span class="ru">Модель дохода</span></td>
+      <td><span class="en">Universal Participation Income — earn by participating, not by existing</span><span class="ru">Универсальный Доход от Участия — зарабатываешь участием, не существованием</span></td>
+      <td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td><span class="en">Acoustic Passport</span><span class="ru">Акустический паспорт</span></td>
+      <td><span class="en">Identity</span><span class="ru">Идентификация</span></td>
+      <td><span class="en">12-parameter voice fingerprint as biometric identity. Enables economic activity, verification, project launching.</span><span class="ru">12-параметровый голосовой отпечаток как биометрическая идентификация. Позволяет экономическую деятельность, верификацию, запуск проектов.</span></td>
+      <td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td>
+    </tr>
+    <tr>
+      <td><strong>DDL</strong></td>
+      <td><span class="en">Governance</span><span class="ru">Управление</span></td>
+      <td><span class="en">Leader proposes idea, collects voices/votes, best ideas "send an echo" and grow</span><span class="ru">Лидер предлагает идею, собирает голоса/голосования, лучшие идеи «посылают эхо» и растут</span></td>
+      <td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="quote-block reveal">
+  <span class="ru">"GRT токен или там GVT, то есть NFT. Это прописка с возможностью капитализироваться."</span>
+  <span class="en">"GRT token or GVT, that is, NFT. It's registration with the ability to capitalize."</span>
+  <div class="attribution">— Alex Berezovsky</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- HIERARCHICAL STRUCTURE TASK -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Structure Task from GMT</span>
+    <span class="ru">Ваша задача от GMT по структуре</span>
+  </h2>
+</div>
+
+<div class="callout crimson reveal">
+  <h4><span class="en">The Tree — Let's Build It Together</span><span class="ru">Дерево — давай сделаем вместе</span></h4>
+  <p>
+    <span class="en">Саш, GMT asked you to "draw the tree" — the full hierarchical structure. I would be genuinely happy to work on this together. You own the structural logic — the pillars, the economic layers, the hierarchical navigation (the Lenin Library analogy, the Flatland third dimension). I own the technical realization — turning your structure into a navigable, visual prototype. Let me know how you'd like to collaborate, and I'll fit into your process. This is the keystone of the whole demo.</span>
+    <span class="ru">Саш, GMT попросил тебя «нарисовать дерево» — полную иерархическую структуру. Я буду искренне рад сделать это вместе. Структурная логика — твоя: столпы, экономические слои, иерархическая навигация (аналогия с Библиотекой Ленина, третье измерение Flatland). Техническая реализация — моя: превратить твою структуру в навигируемый визуальный прототип. Скажи, как тебе удобнее сотрудничать, и я впишусь в твой процесс. Это краеугольный камень всего демо.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- TECHNOLOGY STATUS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Technology Status</span>
+    <span class="ru">Статус технологии</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card">
+    <h3><span class="en">Current State</span><span class="ru">Текущее состояние</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">3 aggregation pipelines under testing</span><span class="ru">3 пайплайна агрегации в тестировании</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">PoC: 16 professional voices aggregated into choir</span><span class="ru">PoC: 16 профессиональных голосов агрегированы в хор</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">1 voice &rarr; 7 voices library discovered</span><span class="ru">Найдена библиотека 1 голос &rarr; 7 голосов</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3><span class="en">April Target</span><span class="ru">Цель на апрель</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">Good audio quality for voice aggregation</span><span class="ru">Хорошее качество аудио для агрегации голосов</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">"Aggressive" but committed timeline</span><span class="ru">«Агрессивный», но принятый срок</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">Sound quality first, then infrastructure</span><span class="ru">Сначала качество звука, потом инфраструктура</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout teal reveal" style="margin-top:1rem;">
+  <h4><span class="en">Your Interference Insight</span><span class="ru">Ваша идея об интерференции</span></h4>
+  <p>
+    <span class="en">As voice count increases, interference causes mutual compensation of imperfections. On small numbers, everything is audible (including flaws). On large numbers, a compensatory mechanism kicks in — you get "thickness" of the choir, not noise. Not amplitude stacking (which creates garbage) but interference-based blending.</span>
+    <span class="ru">С ростом числа голосов интерференция вызывает взаимную компенсацию несовершенств. На малых числах всё слышно (включая дефекты). На больших числах включается компенсаторный механизм — получаешь «толщину» хора, а не шум. Не сложение амплитуд (которое создаёт мусор), а интерференционное смешивание.</span>
+  </p>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">"Если мы поставим предельное количество параметров, 1 миллиард голосов, тогда мы его можем спокойно решить прямо сейчас, что именно это мы запечем потом на чип."</span>
+  <span class="en">"If we set the maximum number of parameters, 1 billion voices, then we can calmly solve it right now — exactly what we'll later bake onto a chip."</span>
+  <div class="attribution">— Alex Berezovsky</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- IDEAS INVENTORY -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Ideas Inventory</span>
+    <span class="ru">Инвентаризация ваших идей</span>
+  </h2>
+  <p class="section-subtitle">
+    <span class="en">Every idea from the call that you championed or co-championed.</span>
+    <span class="ru">Каждая идея со звонка, где вы были инициатором или со-инициатором.</span>
+  </p>
+</div>
+
+<table class="data-table reveal">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th><span class="en">Idea</span><span class="ru">Идея</span></th>
+      <th><span class="en">Status</span><span class="ru">Статус</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>T2</td><td><span class="en">12-parameter voice decomposition</span><span class="ru">12-параметровая декомпозиция голоса</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T3</td><td><span class="en">Bidirectional verification (aggregate forward, extract backward)</span><span class="ru">Двунаправленная верификация (агрегация вперёд, извлечение назад)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T7</td><td><span class="en">ASIC chip — static model, no DRAM, 160K tokens</span><span class="ru">ASIC чип — статическая модель, без DRAM, 160K токенов</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td></tr>
+    <tr><td>T10</td><td><span class="en">Welford's algorithm for O(1) incremental aggregation</span><span class="ru">Алгоритм Уэлфорда для O(1) инкрементальной агрегации</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T11</td><td><span class="en">BLAKE3 hashing + TON blockchain anchoring</span><span class="ru">BLAKE3 хеширование + привязка к блокчейну TON</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T12</td><td><span class="en">Interference-based mutual compensation at scale</span><span class="ru">Интерференционная взаимная компенсация в масштабе</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>E1</td><td><span class="en">Immediate NFT/token reward upon recording</span><span class="ru">Мгновенное вознаграждение NFT/токен при записи</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>E5</td><td><span class="en">Universal Participation Income (full model)</span><span class="ru">Универсальный Доход от Участия (полная модель)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>E7</td><td><span class="en">DDL governance system</span><span class="ru">Система управления DDL</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>E9</td><td><span class="en">Granat as country with internal economy</span><span class="ru">Гранат как страна с внутренней экономикой</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td></tr>
+    <tr><td>G3</td><td><span class="en">Seven Captains for seven life domains</span><span class="ru">Семь Капитанов для семи сфер жизни</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>G5</td><td><span class="en">QR codes on stadium screens</span><span class="ru">QR-коды на экранах стадионов</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>G8</td><td><span class="en">100M users &rarr; 900M tail effect</span><span class="ru">100M пользователей &rarr; 900M хвостовой эффект</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>C6</td><td><span class="en">Sixth technological order transition</span><span class="ru">Переход к шестому технологическому укладу</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td></tr>
+    <tr><td>C11</td><td><span class="en">Flatland analogy — 3D perspective on structures</span><span class="ru">Аналогия Flatland — 3D-перспектива на структуры</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr style="border-top:2px solid var(--border-medium);"><td colspan="3" style="font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;padding-top:0.8rem;"><span class="en">🆕 FROM AB MANIFESTO — March 17, 2026</span><span class="ru">🆕 ИЗ МАНИФЕСТА АБ — 17 марта 2026</span></td></tr>
+    <tr><td>T15</td><td><span class="en">Acoustic events paradigm — sound as parametric events, not wave signals (10-100x smaller than PCM)</span><span class="ru">Парадигма акустических событий — звук как параметрические события, не волновой сигнал (в 10-100 раз меньше PCM)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T16</td><td><span class="en">Phase policy + cluster reduction + protective aggregator — named interference solution</span><span class="ru">Фазовая политика + кластерная редукция + защитный агрегатор — именованное решение интерференции</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T17</td><td><span class="en">Client-side / edge resynthesis — rendering on user device, not servers</span><span class="ru">Ресинтез на стороне клиента — рендеринг на устройстве пользователя, не на серверах</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T18</td><td><span class="en">GPU/FPGA optimized heavy-path pipelines</span><span class="ru">Оптимизированные пайплайны тяжёлого пути на GPU/FPGA</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>T19</td><td><span class="en">Aperiodic component anonymization — biometric privacy by design</span><span class="ru">Анонимизация апериодической составляющей — биометрическая приватность по умолчанию</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T20</td><td><span class="en">Legal reproducibility — juridically defensible determinism</span><span class="ru">Юридическая воспроизводимость — юридически защитимый детерминизм</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+    <tr><td>T21</td><td><span class="en">Canonical event spec + SDK — Granat as protocol standard</span><span class="ru">Каноническая спецификация событий + SDK — Гранат как стандарт протокола</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>V1</td><td><span class="en">Expanded verticals: gaming, metaverse, telecom, streaming, education, social</span><span class="ru">Расширенные вертикали: игры, метавселенная, телеком, стриминг, образование, социальные</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td></tr>
+    <tr><td>P11</td><td><span class="en">"Trust infrastructure for new audio economy" — positioning reframe</span><span class="ru">«Инфраструктура доверия для новой аудиоэкономики» — рефрейминг позиционирования</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td></tr>
+  </tbody>
+</table>
+
+<div class="divider"></div>
+
+<!-- ACTION ITEMS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Action Items</span>
+    <span class="ru">Ваши задачи</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <span class="en"><strong>The "tree" structure</strong> — assigned by GMT. I'm ready to jump in whenever you are. You give me the logic, I turn it into a visual prototype. Let's find a time this week?</span>
+      <span class="ru"><strong>Структура «дерева»</strong> — задание от GMT. Я готов подключиться в любой момент. Ты даёшь мне логику, я превращаю в визуальный прототип. Найдём время на этой неделе?</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <span class="en">Keep three pillars strictly separate in execution. Don't let demo stall on tech, don't let tech be distracted by presentation polish.</span>
+      <span class="ru">Держать три столпа строго раздельными в исполнении. Не давать демо буксовать из-за технологии, не давать технологии отвлекаться на презентационный лоск.</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OPEN QUESTIONS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Open Questions</span>
+    <span class="ru">Открытые вопросы</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="callout purple">
+    <p><span class="en"><strong>Compression ratio</strong> — you flagged it as "not good enough." What's the acceptable target? What are backups if 6KB or lower is unachievable?</span><span class="ru"><strong>Степень сжатия</strong> — вы отметили как «категорически не устраивает». Какова приемлемая цель? Какие запасные варианты, если 6KB или ниже недостижимо?</span></p>
+  </div>
+  <div class="callout purple">
+    <p><span class="en"><strong>Seven Captains — who?</strong> Concept proposed but no candidates identified. Who are the first nodes in the scale-free network?</span><span class="ru"><strong>Семь Капитанов — кто?</strong> Концепция предложена, но кандидаты не определены. Кто первые узлы в безмасштабной сети?</span></p>
+  </div>
+  <div class="callout purple">
+    <p><span class="en"><strong>Full structure document</strong> — GMT asked you to deliver it. I'm ready to jump in and help shape it together — just say when.</span><span class="ru"><strong>Полный документ структуры</strong> — GMT попросил тебя подготовить. Я готов подключиться и помочь сформировать вместе — скажи когда.</span></p>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 4: BOB
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-bob">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">For Bob Lev</span><span class="ru">Для Лёвы</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">Control, Quality, Governance</span>
+    <span class="ru">Контроль, качество, управление</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">Lev, here's the full picture: sprint status, priorities, quality observations, and governance setup. Today we have our core team meeting — let's use it to lock in the control environment.</span>
+    <span class="ru">Лёв, вот полная картина: статус спринта, приоритеты, наблюдения по качеству и настройка управления. Сегодня у нас встреча с ядром команды — давай используем её для закрепления контрольной среды.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SPRINT STATUS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Sprint Status &amp; Governance</span>
+    <span class="ru">Статус спринта и управление</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card">
+    <h3><span class="en">Current Sprint</span><span class="ru">Текущий спринт</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">Direction change: demo becomes interactive manifesto with tree structure</span><span class="ru">Смена направления: демо становится интерактивным манифестом с древовидной структурой</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">Demo and voice R&D now separate tracks</span><span class="ru">Демо и R&D голоса теперь отдельные треки</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">✅ Song switch: now working with Granat's own song</span><span class="ru">✅ Переключение песни: теперь работаем с собственной песней Граната</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3><span class="en">Governance Setup</span><span class="ru">Настройка управления</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">✅ Core team meeting with you — today. Let's set up the control environment</span><span class="ru">✅ Встреча с ядром команды — сегодня. Настроим контрольную среду</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">Goal: clear sprint definitions, acceptance criteria, reporting cadence</span><span class="ru">Цель: чёткие определения спринтов, критерии приёмки, каденция отчётности</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.3rem;"><span class="en">I remember the lesson from the previous team. That won't repeat.</span><span class="ru">Я помню урок предыдущей команды. Это не повторится.</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRIORITY LIST -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Priority List</span>
+    <span class="ru">Список приоритетов</span>
+  </h2>
+</div>
+
+<table class="data-table reveal">
+  <thead>
+    <tr>
+      <th><span class="en">Priority</span><span class="ru">Приоритет</span></th>
+      <th><span class="en">Task</span><span class="ru">Задача</span></th>
+      <th><span class="en">Owner</span><span class="ru">Ответственный</span></th>
+      <th><span class="en">Deadline</span><span class="ru">Срок</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:var(--crimson-bright);font-weight:700;">P0</td>
+      <td><span class="en">Revise demo into interactive manifesto with tree</span><span class="ru">Переделать демо в интерактивный манифест с деревом</span></td>
+      <td>Dima</td>
+      <td><span class="en">Sprint end</span><span class="ru">Конец спринта</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--crimson-bright);font-weight:700;">P0</td>
+      <td><span class="en">✅ Switch to Granat's own song</span><span class="ru">✅ Переключиться на песню Граната</span></td>
+      <td>Dima</td>
+      <td><span class="en">✅ Done</span><span class="ru">✅ Готово</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--gold);font-weight:700;">P1</td>
+      <td><span class="en">Alex draws hierarchical structure</span><span class="ru">Саша рисует иерархическую структуру</span></td>
+      <td>AB</td>
+      <td>ASAP</td>
+    </tr>
+    <tr>
+      <td style="color:var(--gold);font-weight:700;">P1</td>
+      <td><span class="en">Continue 3-pipeline R&D toward April quality</span><span class="ru">Продолжить R&D 3 пайплайнов к апрельскому качеству</span></td>
+      <td>Dima</td>
+      <td><span class="en">End of April</span><span class="ru">Конец апреля</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--teal);font-weight:700;">P2</td>
+      <td><span class="en">✅ Connect with Ilya Lukashev</span><span class="ru">✅ Связаться с Ильёй Лукашевым</span></td>
+      <td>GMT</td>
+      <td><span class="en">✅ Call today 16:30 CET</span><span class="ru">✅ Звонок сегодня 16:30 CET</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--teal);font-weight:700;">P2</td>
+      <td><span class="en">Olga-Dima coordination setup</span><span class="ru">Настройка координации Ольга-Дима</span></td>
+      <td>OA, Dima</td>
+      <td><span class="en">Ongoing</span><span class="ru">Постоянно</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="divider"></div>
+
+<!-- QUALITY OBSERVATIONS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Quality Observations — Acknowledged</span>
+    <span class="ru">Наблюдения по качеству — учтены</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="callout gold">
+    <h4><span class="en">Color Feedback</span><span class="ru">Отзыв по цветам</span></h4>
+    <p>
+      <span class="en">You flagged the dark aesthetic as a concern, aligned with GMT's feedback for brighter, more life-affirming colors. This document is the first implementation of the new direction — dark base with teal, purple, coral accents.</span>
+      <span class="ru">Вы отметили тёмную эстетику как проблему, в согласии с отзывом GMT о более ярких, жизнерадостных цветах. Этот документ — первая реализация нового направления — тёмная база с бирюзовыми, фиолетовыми, коралловыми акцентами.</span>
+    </p>
+  </div>
+  <div class="callout gold">
+    <h4><span class="en">Audio Quality</span><span class="ru">Качество аудио</span></h4>
+    <p>
+      <span class="en">You noted significant quality differences between voices recorded on different devices. This was deliberate — the team modeled real user behavior (street noise, phone mics). The hardest case is the design case.</span>
+      <span class="ru">Вы отметили значительные различия качества между голосами, записанными на разных устройствах. Это было намеренно — команда моделировала реальное поведение пользователей (уличный шум, микрофоны телефонов). Самый сложный случай — это проектный случай.</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- YOUR ACTION ITEMS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Action Items</span>
+    <span class="ru">Ваши задачи</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <span class="en"><strong>Today's core team meeting</strong> — let's set up sprint definitions, acceptance criteria, and reporting cadence together. I want to do this right from the start.</span>
+      <span class="ru"><strong>Сегодняшняя встреча с ядром команды</strong> — давай настроим определения спринтов, критерии приёмки и каденцию отчётности вместе. Хочу сделать это правильно с самого начала.</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <span class="en">Monitor demo sprint execution against agreed milestones.</span>
+      <span class="ru">Контролировать исполнение демо-спринта по согласованным вехам.</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">3</div>
+    <div class="action-body">
+      <span class="en">Track voice R&D progress toward April quality target (separate from demo track).</span>
+      <span class="ru">Отслеживать прогресс R&D голоса к апрельской цели по качеству (отдельно от трека демо).</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TIMELINE -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Timeline Overview</span>
+    <span class="ru">Обзор таймлайна</span>
+  </h2>
+</div>
+
+<div class="grid-3 reveal">
+  <div class="card" style="border-color:var(--crimson-bright);">
+    <h3><span class="en">Now</span><span class="ru">Сейчас</span></h3>
+    <p><span class="en">Demo rework into interactive manifesto. Song switch. Structure document from Alex.</span><span class="ru">Переделка демо в интерактивный манифест. Переключение песни. Документ структуры от Саши.</span></p>
+  </div>
+  <div class="card" style="border-color:var(--gold);">
+    <h3><span class="en">End of April</span><span class="ru">Конец апреля</span></h3>
+    <p><span class="en">Voice technology quality milestone. Good audio aggregation. Offline planning can resume.</span><span class="ru">Веха качества технологии голоса. Хорошая аудио-агрегация. Можно возобновить оффлайн-планирование.</span></p>
+  </div>
+  <div class="card" style="border-color:var(--teal);">
+    <h3><span class="en">Post-April</span><span class="ru">После апреля</span></h3>
+    <p><span class="en">GMT returns from studio. Offline events resume. Demo cubes fill in with real features. MVP formation.</span><span class="ru">GMT возвращается из студии. Оффлайн-мероприятия возобновляются. Кубики демо заполняются реальными функциями. Формирование MVP.</span></p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OPEN QUESTIONS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Open Questions</span>
+    <span class="ru">Открытые вопросы</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="callout purple">
+    <p><span class="en"><strong>Demo timeline post-direction-change:</strong> How many days remain? Significant rework needed — what's the realistic delivery date?</span><span class="ru"><strong>Таймлайн демо после смены направления:</strong> Сколько дней осталось? Нужна значительная переработка — какова реалистичная дата сдачи?</span></p>
+  </div>
+  <div class="callout purple">
+    <p><span class="en"><strong>Which demo survives?</strong> Two demos were built (mobile + desktop). After direction shift, which one gets developed further?</span><span class="ru"><strong>Какое демо выживет?</strong> Два демо были построены (мобильное + десктопное). После смены направления, какое развивается дальше?</span></p>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 5: ILYA
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-ilya">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">For Hector Cryo (Ilya)</span><span class="ru">Для Ильи (Гектор Крио)</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">Sound, Music, Verification</span>
+    <span class="ru">Звук, музыка, верификация</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">Ilya, your ear is critical for everything we're building. Here's your scope, the song requirements, and where I need you most. Today at 16:30 CET we have the call with Ilya Lukashev — big day!</span>
+    <span class="ru">Илья, твой слух — критичен для всего, что мы строим. Вот твой объём работ, требования к песне и где ты нужен больше всего. Сегодня в 16:30 CET у нас звонок с Ильёй Лукашевым — важный день!</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SOUND SCOPE -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Sound Scope</span>
+    <span class="ru">Ваш объём по звуку</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card teal">
+    <h3><span class="en">What You're Needed For</span><span class="ru">Для чего вы нужны</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en">Musical ear validation at every aggregation milestone</span><span class="ru">Валидация музыкальным слухом на каждой вехе агрегации</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en">Composition-layer processing guidance (your key insight: aggregate at composition stage, not mix stage)</span><span class="ru">Руководство по обработке на композиционном слое (ваша ключевая идея: агрегация на стадии композиции, не на стадии микса)</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en">Quality verification of each pipeline iteration</span><span class="ru">Верификация качества каждой итерации пайплайна</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en">Stadium sound reference calibration</span><span class="ru">Калибровка по эталону стадионного звука</span></li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h3><span class="en">When You're Needed</span><span class="ru">Когда вы нужны</span></h3>
+    <ul style="padding-left:1rem;margin-top:0.5rem;">
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en"><strong>Now:</strong> Formal technical session to discuss aggregation architecture</span><span class="ru"><strong>Сейчас:</strong> Формальная техническая сессия для обсуждения архитектуры агрегации</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en"><strong>Ongoing:</strong> Verification loops for each pipeline milestone</span><span class="ru"><strong>Постоянно:</strong> Циклы верификации для каждой вехи пайплайна</span></li>
+      <li style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.4rem;"><span class="en"><strong>April:</strong> Critical quality assessment at tech milestone</span><span class="ru"><strong>Апрель:</strong> Критическая оценка качества на технологическом рубеже</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SONG REQUIREMENTS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Song Requirements</span>
+    <span class="ru">Требования к песне</span>
+  </h2>
+</div>
+
+<div class="callout crimson reveal">
+  <h4><span class="en">Non-Negotiable</span><span class="ru">Не подлежит обсуждению</span></h4>
+  <ul>
+    <li><span class="en"><strong>Main song always in front</strong> — GMT's composition leads. All aggregated voices sit behind it, never overpowering, never "sticking out."</span><span class="ru"><strong>Главная песня всегда впереди</strong> — композиция GMT ведёт. Все агрегированные голоса стоят позади неё, никогда не перебивая, никогда не «торча».
+    </span></li>
+    <li><span class="en"><strong>Stadium effect</strong> — voices create a "barrel of sound" playing as general background. Primarily volume balancing.</span><span class="ru"><strong>Стадионный эффект</strong> — голоса создают «бочку» звука, играющую как общий фон. В основном балансировка громкости.</span></li>
+    <li><span class="en"><strong>Must work on Granat's own song</strong> — ✅ already switched. All testing now on the real composition.</span><span class="ru"><strong>Должно работать на собственной песне Граната</strong> — ✅ уже переключились. Все тесты теперь на настоящей композиции.</span></li>
+  </ul>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">"Песня не должна меняться. Настолько песня должна быть выставлена вперед, а голоса стоять сзади за ней."</span>
+  <span class="en">"The song must not change. The song must be so much in front, with voices standing behind it."</span>
+  <div class="attribution">— Olga</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROGRESSIVE DEMO -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Progressive Demo Idea</span>
+    <span class="ru">Ваша идея прогрессивного демо</span>
+  </h2>
+</div>
+
+<div class="callout teal reveal">
+  <h4><span class="en">Praised by the Team</span><span class="ru">Высоко оценена командой</span></h4>
+  <p>
+    <span class="en">Your concept: demonstrate how <strong>700 voices &rarr; 7,000 voices &rarr; 7 million voices</strong> sound differently. A progression that creates the wow-effect for stakeholders. Dima identified a library that can generate 7 different voices from 1 voice to make this possible.</span>
+    <span class="ru">Ваша концепция: продемонстрировать, как звучат <strong>700 голосов &rarr; 7 000 голосов &rarr; 7 миллионов голосов</strong>. Прогрессия, создающая вау-эффект для стейкхолдеров. Дима нашёл библиотеку, которая может сгенерировать 7 разных голосов из 1 голоса, чтобы это стало возможным.</span>
+  </p>
+</div>
+
+<div class="grid-3 reveal" style="margin-top:1rem;">
+  <div class="card" style="text-align:center;">
+    <h3 style="font-size:2rem;color:var(--teal-light);">700</h3>
+    <p><span class="en">First chorus layer. Individual voices still distinguishable.</span><span class="ru">Первый хоровой слой. Отдельные голоса ещё различимы.</span></p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <h3 style="font-size:2rem;color:var(--purple-light);">7,000</h3>
+    <p><span class="en">Thickness emerging. Interference compensation begins.</span><span class="ru">Появляется толщина. Начинается интерференционная компенсация.</span></p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <h3 style="font-size:2rem;color:var(--gold-light);">7,000,000</h3>
+    <p><span class="en">Full stadium effect. The barrel of sound. The wow moment.</span><span class="ru">Полный стадионный эффект. Бочка звука. Момент «вау».</span></p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- VOICE MULTIPLICATION -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Voice Multiplication Library</span>
+    <span class="ru">Библиотека умножения голосов</span>
+  </h2>
+</div>
+
+<div class="card reveal">
+  <h3><span class="en">1 Voice &rarr; 7 Voices</span><span class="ru">1 Голос &rarr; 7 Голосов</span></h3>
+  <p>
+    <span class="en">Open-source library discovered by Dima. Splits 1 voice into 7 different voices in different timbres. Purpose: simulate 700, 7,000, 70,000 voices for your progressive demo concept without needing that many real recordings.</span>
+    <span class="ru">Open-source библиотека, найденная Димой. Разделяет 1 голос на 7 разных голосов в разных тембрах. Цель: симулировать 700, 7 000, 70 000 голосов для вашей концепции прогрессивного демо без необходимости стольких реальных записей.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ILYA LUKASHEV -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Ilya Lukashev Connection</span>
+    <span class="ru">Связь с Ильёй Лукашевым</span>
+  </h2>
+</div>
+
+<div class="callout gold reveal">
+  <h4><span class="en">Timeline</span><span class="ru">Таймлайн</span></h4>
+  <p>
+    <span class="en">GMT will connect Dima + you (Hector Cryo) with Ilya Lukashev ("best from the west") — professional sound engineer for advanced consultative support. <strong>✅ Call scheduled: today, 16:30 CET.</strong> You handle day-to-day technical music interaction; Lukashev handles fine tuning on critical milestones.</span>
+    <span class="ru">GMT связал Диму + вас (Гектор Крио) с Ильёй Лукашевым («лучший с запада») — профессиональный звукорежиссёр для продвинутой консультативной поддержки. <strong>✅ Звонок назначен: сегодня, 16:30 CET.</strong> Вы ведёте ежедневное техническо-музыкальное взаимодействие; Лукашев занимается тонкими настройками на критических вехах.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ACTION ITEMS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Your Action Items</span>
+    <span class="ru">Ваши задачи</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <span class="en"><strong>Schedule formal technical session with Dima</strong> — discuss aggregation architecture, share your composition-layer observations, establish collaboration rhythm.</span>
+      <span class="ru"><strong>Назначить формальную техническую сессию с Димой</strong> — обсудить архитектуру агрегации, поделиться наблюдениями о композиционном слое, установить ритм сотрудничества.</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <span class="en"><strong>✅ Song file</strong> — already have it! Now integrating into demo and R&D pipelines.</span>
+      <span class="ru"><strong>✅ Файл песни</strong> — уже есть! Интегрируем в демо и R&D-пайплайны.</span>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">3</div>
+    <div class="action-body">
+      <span class="en">Lukashev call is TODAY (16:30 CET) — have your composition-layer insights and stadium-reference calibration ideas ready.</span>
+      <span class="ru">Звонок с Лукашевым — СЕГОДНЯ (16:30 CET)! Подготовь свои идеи о композиционном слое и калибровке по стадионному эталону.</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OPEN QUESTIONS -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem;">
+    <span class="en">Open Questions</span>
+    <span class="ru">Открытые вопросы</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="callout purple">
+    <p><span class="en"><strong>Spectral vs. non-spectral approach:</strong> Is spectrogram-based processing needed? Your input as a sound engineer is critical for this decision.</span><span class="ru"><strong>Спектральный vs. не-спектральный подход:</strong> Нужна ли обработка на основе спектрограмм? Ваш вклад как звукоинженера критичен для этого решения.</span></p>
+  </div>
+  <div class="callout purple">
+    <p><span class="en"><strong>Post-aggregation artifacts:</strong> How severe are the mechanical artifacts in current output? What's the quality bar for "good enough"?</span><span class="ru"><strong>Артефакты после агрегации:</strong> Насколько серьёзны механические артефакты в текущем выходе? Какая планка качества для «достаточно хорошо»?</span></p>
+  </div>
+  <div class="callout purple">
+    <p><span class="en"><strong>Your availability:</strong> US timezone noted. What's the best schedule for regular verification calls with the team?</span><span class="ru"><strong>Ваша доступность:</strong> Отмечен часовой пояс США. Какое лучшее расписание для регулярных верификационных звонков с командой?</span></p>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 6: DIMA
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-dima">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label coral">
+    <span class="en">Dima Levin — Delivery Lead (Cone Red)</span><span class="ru">Дима Левин — Руководитель Реализации (Cone Red)</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">What I'm Delivering, Why, and How</span>
+    <span class="ru">Что я делаю, зачем и как</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">Full transparency on my commitments, approach, and timeline. Two independent workstreams, no vinaigrette.</span>
+    <span class="ru">Полная прозрачность по моим обязательствам, подходу и срокам. Два независимых потока работы, без винегрета.</span>
+  </p>
+</div>
+
+<!-- Two Workstreams -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.4rem;">
+    <span class="en">My Two Workstreams</span>
+    <span class="ru">Мои два потока работы</span>
+  </h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:2rem 0;">
+    <div class="glass-card" style="border-left:3px solid var(--teal);">
+      <h3 style="color:var(--teal-light); margin-bottom:0.8rem;">
+        <span class="en">Stream 1: Demo / Presentation</span>
+        <span class="ru">Поток 1: Демо / Презентация</span>
+      </h3>
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">
+        <span class="en">Interactive platform prototype ("The Tree") — the tool GMT needs to show decision-makers.</span>
+        <span class="ru">Интерактивный прототип платформы («Древо») — инструмент, который нужен GMT для встреч с лицами, принимающими решения.</span>
+      </p>
+      <div style="font-size:0.75rem; color:var(--teal); font-weight:600; letter-spacing:1px; text-transform:uppercase;">
+        <span class="en">TIMELINE: THIS WEEK + NEXT</span>
+        <span class="ru">СРОК: ЭТА + СЛЕДУЮЩАЯ НЕДЕЛЯ</span>
+      </div>
+    </div>
+    <div class="glass-card" style="border-left:3px solid var(--purple);">
+      <h3 style="color:var(--purple-light); margin-bottom:0.8rem;">
+        <span class="en">Stream 2: Voice Aggregation R&D</span>
+        <span class="ru">Поток 2: R&D Агрегации Голосов</span>
+      </h3>
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">
+        <span class="en">Three AI pipelines — decomposition, aggregation, resynthesis. Sound quality is the priority.</span>
+        <span class="ru">Три AI-пайплайна — декомпозиция, агрегация, ресинтез. Качество звучания — приоритет.</span>
+      </p>
+      <div style="font-size:0.75rem; color:var(--purple); font-weight:600; letter-spacing:1px; text-transform:uppercase;">
+        <span class="en">TIMELINE: END OF APRIL</span>
+        <span class="ru">СРОК: КОНЕЦ АПРЕЛЯ</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stream 1: Demo Detail -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem; color:var(--teal-light);">
+    <span class="en">Stream 1: Demo — Detailed Plan</span>
+    <span class="ru">Поток 1: Демо — Детальный план</span>
+  </h2>
+
+  <h3 style="color:var(--text-bright); margin:1.5rem 0 0.8rem;">
+    <span class="en">What I'm Building</span>
+    <span class="ru">Что я строю</span>
+  </h3>
+  <p style="color:var(--text-secondary); margin-bottom:1.5rem;">
+    <span class="en">An interactive web prototype based on the Manifesto structure — the presentation that Olga confirmed captured the concept correctly. Transforming it from a static document into a navigable, explorable platform concept.</span>
+    <span class="ru">Интерактивный веб-прототип на базе структуры Манифеста — презентации, о которой Ольга подтвердила, что концепция передана верно. Превращаю статичный документ в навигируемую, исследуемую концепцию платформы.</span>
+  </p>
+
+  <table class="data-table reveal">
+    <thead>
+      <tr>
+        <th><span class="en">Component</span><span class="ru">Компонент</span></th>
+        <th><span class="en">What It Does</span><span class="ru">Что делает</span></th>
+        <th><span class="en">Why It Matters</span><span class="ru">Зачем</span></th>
+        <th><span class="en">Status</span><span class="ru">Статус</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">The Tree (overview)</span><span class="ru">Древо (обзор)</span></td>
+        <td><span class="en">Hierarchical map of all Granat — voice, song, economy, community, tech</span><span class="ru">Иерархическая карта всего Граната — голос, песня, экономика, сообщество, технология</span></td>
+        <td><span class="en">GMT's #1 ask: "Draw me this tree." Partners see the whole picture in 10 seconds</span><span class="ru">Главный запрос GMT: «Нарисуйте мне это дерево.» Партнёры видят всю картину за 10 секунд</span></td>
+        <td><span style="color:var(--coral);">🔄 <span class="en">In design</span><span class="ru">В дизайне</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">Navigation</span><span class="ru">Навигация</span></td>
+        <td><span class="en">Drill into any branch. Not linear scroll — hierarchical exploration</span><span class="ru">Вход в любую ветку. Не линейный скролл — иерархическое исследование</span></td>
+        <td><span class="en">Alex's key requirement: see from above OR drill down, like finding a book in a library</span><span class="ru">Ключевое требование Саши: видеть сверху ИЛИ углубляться, как поиск книги в библиотеке</span></td>
+        <td><span style="color:var(--coral);">🔄 <span class="en">In design</span><span class="ru">В дизайне</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">"Leave Your Voice" button</span><span class="ru">Кнопка «Оставь голос»</span></td>
+        <td><span class="en">Async voice recording. Collect now, aggregate later. Counter shows total voices</span><span class="ru">Асинхронная запись голоса. Собираем сейчас, агрегируем позже. Счётчик показывает общее число голосов</span></td>
+        <td><span class="en">Middle ground between GMT (wants recording) and Olga (no tech dependency). We collect real voices without blocking on aggregation</span><span class="ru">Компромисс между GMT (хочет запись) и Ольгой (без зависимости от технологии). Собираем реальные голоса, не блокируясь на агрегации</span></td>
+        <td><span style="color:var(--gold);">📋 <span class="en">Planned</span><span class="ru">Запланировано</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">Song player</span><span class="ru">Проигрыватель песни</span></td>
+        <td><span class="en">Play the actual Granat song within the demo</span><span class="ru">Воспроизведение реальной песни Граната внутри демо</span></td>
+        <td><span class="en">Olga: the song is the heart. Must be present. Voices behind it, never in front</span><span class="ru">Ольга: песня — сердце. Должна быть. Голоса — за ней, никогда не впереди</span></td>
+        <td><span style="color:var(--teal);">✅ <span class="en">Song available</span><span class="ru">Песня есть</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">Economy visualization</span><span class="ru">Визуализация экономики</span></td>
+        <td><span class="en">Show what happens when you contribute: NFT, token, passport</span><span class="ru">Показать, что происходит при вкладе: NFT, токен, паспорт</span></td>
+        <td><span class="en">Alex + Olga: partners need to see the full retention loop, not just voice recording</span><span class="ru">Саша + Ольга: партнёрам нужно видеть полный цикл удержания, не только запись голоса</span></td>
+        <td><span style="color:var(--gold);">📋 <span class="en">Planned</span><span class="ru">Запланировано</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">New color palette</span><span class="ru">Новая цветовая палитра</span></td>
+        <td><span class="en">Brighter, celebratory tones — teal, light purple, warm gold — on dark premium base</span><span class="ru">Яркие, праздничные тона — бирюзовый, светло-фиолетовый, тёплое золото — на тёмной премиальной основе</span></td>
+        <td><span class="en">GMT + Bob: FIFA is bright. Granat should invite participation, not intimidate</span><span class="ru">GMT + Лёва: FIFA — ярко. Гранат должен приглашать, а не создавать пафос</span></td>
+        <td><span style="color:var(--teal);">✅ <span class="en">This document is the first sample</span><span class="ru">Этот документ — первый пример</span></span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--teal-light); font-weight:600;"><span class="en">Active / Coming Soon blocks</span><span class="ru">Активные / «Скоро» блоки</span></td>
+        <td><span class="en">Working features are interactive. Future features show concept with "in development" badge</span><span class="ru">Работающие функции интерактивны. Будущие показывают концепцию со значком «в разработке»</span></td>
+        <td><span class="en">Olga's "кубики" approach: we build block by block, each a real foundation piece</span><span class="ru">Подход Ольги «кубики»: строим блок за блоком, каждый — настоящий элемент фундамента</span></td>
+        <td><span style="color:var(--gold);">📋 <span class="en">Planned</span><span class="ru">Запланировано</span></span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Stream 1: How I'm Approaching It -->
+<div class="reveal">
+  <h3 style="color:var(--text-bright); margin:2rem 0 0.8rem;">
+    <span class="en">How I'm Approaching the Demo</span>
+    <span class="ru">Как я подхожу к демо</span>
+  </h3>
+  <div class="glass-card">
+    <p style="color:var(--text-secondary); margin-bottom:1rem;">
+      <span class="en"><strong style="color:var(--teal-light);">Agent team replanning.</strong> The previous demo direction (dark cinematic scroll-through) is archived. I'm running the agent team (Prody — product, Conny — strategy, Riot — design) through a full replanning cycle based on the March 15 decisions. This produces a new information architecture, visual direction, and component specs before any code is written.</span>
+      <span class="ru"><strong style="color:var(--teal-light);">Переплананирование командой агентов.</strong> Предыдущее направление демо (тёмный кинематографический скролл) архивировано. Запускаю команду агентов (Prody — продукт, Conny — стратегия, Riot — дизайн) через полный цикл перепланирования на основе решений 15 марта. Результат — новая информационная архитектура, визуальное направление и спецификации компонентов ДО написания кода.</span>
+    </p>
+    <p style="color:var(--text-secondary); margin-bottom:1rem;">
+      <span class="en"><strong style="color:var(--teal-light);">Iterative feedback with Olga.</strong> Instead of building in isolation for a week and then presenting — I'll be sending intermediate versions for quick feedback. This way we converge on the right direction fast without wasting effort.</span>
+      <span class="ru"><strong style="color:var(--teal-light);">Итеративная обратная связь с Ольгой.</strong> Вместо того, чтобы строить неделю в изоляции, а потом показывать — буду отправлять промежуточные версии для быстрой обратной связи. Так мы быстро сходимся к правильному направлению без потери усилий.</span>
+    </p>
+    <p style="color:var(--text-secondary);">
+      <span class="en"><strong style="color:var(--teal-light);">Reusing what works.</strong> The particle engine, seed system, GSAP animations, and SVG assets from the previous demo are technically sound. I'll carry forward the engineering while redesigning the product concept on top of it.</span>
+      <span class="ru"><strong style="color:var(--teal-light);">Переиспользование того, что работает.</strong> Движок частиц, система семян, анимации GSAP и SVG-ассеты из предыдущего демо технически крепки. Сохраняю инженерию, перестраивая продуктовую концепцию поверх неё.</span>
+    </p>
+  </div>
+</div>
+
+<!-- Team -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem; margin-top:3rem;">
+    <span class="en">The Team Behind the Delivery</span>
+    <span class="ru">Команда за реализацией</span>
+  </h2>
+  <p class="section-subtitle">
+    <span class="en">This is not a one-person operation. Every workstream has dedicated specialists driving ideas, validation, and execution.</span>
+    <span class="ru">Это не работа одного человека. За каждым потоком — выделенные специалисты, которые двигают идеи, валидацию и реализацию.</span>
+  </p>
+
+  <!-- Cone Red Team -->
+  <div class="glass-card" style="border-left:3px solid var(--teal); margin-bottom:1.5rem;">
+    <h3 style="color:var(--teal); margin-bottom:0.8rem; font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+      <span class="en">Cone Red Team — R&D, Delivery, Implementation</span><span class="ru">Команда Cone Red — R&D, поставка, реализация</span>
+    </h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <ul style="list-style:none; padding:0; font-size:0.85rem; color:var(--text-secondary);">
+        <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-subtle);">
+          <strong style="color:var(--text-primary);">
+            <span class="en">ML Engineers</span><span class="ru">ML-инженеры</span>
+          </strong>
+          <span class="en"> — Three aggregation pipelines, audio processing, model training and evaluation</span>
+          <span class="ru"> — три пайплайна агрегации, обработка аудио, обучение и оценка моделей</span>
+        </li>
+        <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-subtle);">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Frontend Engineers</span><span class="ru">Фронтенд-инженеры</span>
+          </strong>
+          <span class="en"> — Interactive prototype, Canvas/GSAP animations, responsive implementation</span>
+          <span class="ru"> — интерактивный прототип, Canvas/GSAP анимации, адаптивная вёрстка</span>
+        </li>
+        <li style="padding:0.4rem 0;">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Product & Strategy</span><span class="ru">Продукт и стратегия</span>
+          </strong>
+          <span class="en"> — AI-assisted planning, information architecture, strategic review</span>
+          <span class="ru"> — AI-ассистированное планирование, информационная архитектура, стратегический обзор</span>
+        </li>
+      </ul>
+      <ul style="list-style:none; padding:0; font-size:0.85rem; color:var(--text-secondary);">
+        <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-subtle);">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Art Director</span><span class="ru">Арт-директор</span>
+          </strong>
+          <span class="en"> — Perekrestok Group. Design direction for demo; his team joins for product UI/UX</span>
+          <span class="ru"> — группа Перекрёсток. Направление дизайна для демо; его команда подключается к UI/UX продукта</span>
+        </li>
+        <li style="padding:0.4rem 0;">
+          <strong style="color:var(--text-primary);">Dalton</strong>
+          <span class="en"> — Data Science Director (international med company). Former Head of Graph AI R&D. Plays viola in orchestra. Directs ML research, validates hypotheses</span>
+          <span class="ru"> — Директор Data Science (международная мед. компания). Экс-глава R&D Graph AI. Играет на альте в оркестре. Направляет ML-исследования, валидирует гипотезы</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Granat Team + External -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+    <div class="glass-card" style="border-left:3px solid var(--gold);">
+      <h3 style="color:var(--gold); margin-bottom:0.5rem; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+        <span class="en">Granat Team</span><span class="ru">Команда Граната</span>
+      </h3>
+      <ul style="list-style:none; padding:0; font-size:0.85rem; color:var(--text-secondary);">
+        <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-subtle);">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Ilya (Hector Cryo)</span><span class="ru">Илья (Гектор Крио)</span>
+          </strong>
+          <span class="en"> — Music & sound. Daily audio quality verification. The only ear that validates the output.</span>
+          <span class="ru"> — Музыка и звук. Ежедневная верификация качества аудио. Единственный слух, валидирующий результат.</span>
+        </li>
+        <li style="padding:0.4rem 0;">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Lev (Bob)</span><span class="ru">Лёва (Боб)</span>
+          </strong>
+          <span class="en"> — Project control & QA. Sprint governance, quality gates, accountability.</span>
+          <span class="ru"> — Контроль проекта и QA. Управление спринтами, ворота качества, подотчётность.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="glass-card" style="border-left:3px solid var(--purple);">
+      <h3 style="color:var(--purple); margin-bottom:0.5rem; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+        <span class="en">External Advisors</span><span class="ru">Внешние консультанты</span>
+      </h3>
+      <ul style="list-style:none; padding:0; font-size:0.85rem; color:var(--text-secondary);">
+        <li style="padding:0.4rem 0;">
+          <strong style="color:var(--text-primary);">
+            <span class="en">Ilya Lukashev</span><span class="ru">Илья Лукашев</span>
+          </strong>
+          <span class="en"> — Professional sound engineer ("best from the west"). Milestone fine-tuning. ✅ First call today, scheduling weekly cadence.</span>
+          <span class="ru"> — Профессиональный звукорежиссёр («лучший с запада»). Тонкая настройка на этапах. ✅ Первый звонок сегодня, планируем еженедельную каденцию.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout gold" style="margin-top:1.5rem;">
+    <p><span class="en">My role is delivery lead at Cone Red. I coordinate the R&D, engineering, and design teams and make sure every workstream converges on the shared vision. Ilya and Lev on the Granat side are the quality gates — nothing ships without their validation. The ideas and breakthroughs come from the collective intelligence of all of us.</span>
+    <span class="ru">Моя роль — руководитель реализации в Cone Red. Координирую команды R&D, инженерии и дизайна, слежу, чтобы каждый поток работы сходился к общему видению. Илья и Лёва со стороны Граната — ворота качества: ничего не уходит без их валидации. Идеи и прорывы рождаются из коллективного интеллекта всех нас.</span></p>
+  </div>
+</div>
+
+<!-- Stream 2: Voice R&D -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem; color:var(--purple-light); margin-top:3rem;">
+    <span class="en">Stream 2: Voice Aggregation R&D</span>
+    <span class="ru">Поток 2: R&D Агрегации Голосов</span>
+  </h2>
+
+  <h3 style="color:var(--text-bright); margin:1.5rem 0 0.8rem;">
+    <span class="en">Where We Are</span>
+    <span class="ru">Где мы сейчас</span>
+  </h3>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin:1.5rem 0;">
+    <div class="glass-card" style="text-align:center;">
+      <div style="font-size:2rem; color:var(--purple-light); font-weight:700;">3</div>
+      <div style="font-size:0.8rem; color:var(--text-secondary);">
+        <span class="en">Parallel pipelines</span><span class="ru">Параллельных пайплайна</span>
+      </div>
+    </div>
+    <div class="glass-card" style="text-align:center;">
+      <div style="font-size:2rem; color:var(--purple-light); font-weight:700;">16</div>
+      <div style="font-size:0.8rem; color:var(--text-secondary);">
+        <span class="en">Voices in PoC choir</span><span class="ru">Голосов в PoC-хоре</span>
+      </div>
+    </div>
+    <div class="glass-card" style="text-align:center;">
+      <div style="font-size:2rem; color:var(--purple-light); font-weight:700;">12</div>
+      <div style="font-size:0.8rem; color:var(--text-secondary);">
+        <span class="en">Voice parameters</span><span class="ru">Параметров голоса</span>
+      </div>
+    </div>
+  </div>
+
+  <table class="data-table reveal">
+    <thead>
+      <tr>
+        <th><span class="en">What I'm Working On</span><span class="ru">Над чем работаю</span></th>
+        <th><span class="en">Why</span><span class="ru">Зачем</span></th>
+        <th><span class="en">Target</span><span class="ru">Цель</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="en">Pre-processing: clean non-voice artifacts</span><span class="ru">Пред-обработка: очистка от не-голосовых артефактов</span></td>
+        <td><span class="en">Raw phone recordings add noise that creates artifacts in aggregation</span><span class="ru">Сырые записи с телефонов добавляют шум, создающий артефакты при агрегации</span></td>
+        <td><span class="en">End of March</span><span class="ru">Конец марта</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Post-processing: beautify final output</span><span class="ru">Пост-обработка: улучшение финального звучания</span></td>
+        <td><span class="en">After aggregation, there are inconsistencies that need smoothing</span><span class="ru">После агрегации есть нестыковки, требующие сглаживания</span></td>
+        <td><span class="en">Mid-April</span><span class="ru">Середина апреля</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Harmonics: add harmonic quality</span><span class="ru">Гармоники: добавление гармонического качества</span></td>
+        <td><span class="en">Aggregated output should sound like a choir, not a mashup</span><span class="ru">Агрегированный результат должен звучать как хор, а не мэшап</span></td>
+        <td><span class="en">End of April</span><span class="ru">Конец апреля</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Pipeline comparison: which approach wins?</span><span class="ru">Сравнение пайплайнов: какой подход выигрывает?</span></td>
+        <td><span class="en">Three approaches running in parallel — need to converge on best combination</span><span class="ru">Три подхода параллельно — нужно определить лучшую комбинацию</span></td>
+        <td><span class="en">End of April</span><span class="ru">Конец апреля</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Switch to Granat song</span><span class="ru">Переход на песню Граната</span></td>
+        <td><span class="en">All testing must happen on the actual song, not test tracks</span><span class="ru">Все тесты должны идти на реальной песне, не на тестовых треках</span></td>
+        <td><span class="en">✅ Song available, integrating</span><span class="ru">✅ Песня есть, интегрируем</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Approach: Sound quality first -->
+<div class="reveal">
+  <div class="callout teal" style="margin:2rem 0;">
+    <p><span class="en"><strong>My approach:</strong> Sound quality first, infrastructure optimization second. If we have a beautiful-sounding result that's not yet optimized for scale — that's a good position. We can optimize later. If we have a fast system that sounds bad — we have nothing.</span>
+    <span class="ru"><strong>Мой подход:</strong> Качество звучания — первым, оптимизация инфраструктуры — вторым. Если у нас красиво звучащий результат, который ещё не оптимизирован для масштаба — это хорошая позиция. Оптимизировать можем позже. Если у нас быстрая система, которая звучит плохо — у нас ничего нет.</span></p>
+  </div>
+</div>
+
+<!-- Plan B -->
+<div class="reveal">
+  <h3 style="color:var(--text-bright); margin:2rem 0 0.8rem;">
+    <span class="en">Plan B (Risk Mitigation)</span>
+    <span class="ru">План Б (Управление рисками)</span>
+  </h3>
+  <div class="glass-card">
+    <p style="color:var(--text-secondary);">
+      <span class="en">Three pipelines are our built-in insurance. If one approach hits a wall, components from others can substitute. We've already demonstrated proof-of-concept (16 professional voices aggregated into a choir). The question is not "can we do it" — it's "how good can we make it sound by April."</span>
+      <span class="ru">Три пайплайна — наша встроенная страховка. Если один подход упрётся в стену, компоненты из других могут заменить. PoC уже продемонстрирован (16 профессиональных голосов агрегированы в хор). Вопрос не «можем ли мы», а «насколько хорошо мы сможем это сделать к апрелю».</span>
+    </p>
+  </div>
+</div>
+
+<!-- Dependencies: What I Need From Each Person -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem; margin-top:3rem;">
+    <span class="en">What I Need From Each of You</span>
+    <span class="ru">Что мне нужно от каждого из вас</span>
+  </h2>
+  <table class="data-table reveal">
+    <thead>
+      <tr>
+        <th><span class="en">From</span><span class="ru">От кого</span></th>
+        <th><span class="en">What I need</span><span class="ru">Что нужно</span></th>
+        <th><span class="en">Why</span><span class="ru">Зачем</span></th>
+        <th><span class="en">When</span><span class="ru">Когда</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--gold-light); font-weight:600;"><span class="en">Olga</span><span class="ru">Ольга</span></td>
+        <td><span class="en">Intermediate feedback on demo versions</span><span class="ru">Промежуточная обратная связь по версиям демо</span></td>
+        <td><span class="en">So we converge fast, not build in the wrong direction</span><span class="ru">Чтобы быстро сходиться, а не строить в неверном направлении</span></td>
+        <td><span class="en">As I send them (2-3 times/week)</span><span class="ru">По мере отправки (2-3 раза/неделю)</span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--gold-light); font-weight:600;"><span class="en">Alex</span><span class="ru">Саша</span></td>
+        <td><span class="en">Hierarchical structure document ("the tree")</span><span class="ru">Документ иерархической структуры («дерево»)</span></td>
+        <td><span class="en">I can design the tree visually, but you own the full structural logic</span><span class="ru">Я могу спроектировать дерево визуально, но полная структурная логика — у тебя</span></td>
+        <td><span class="en">ASAP — demo design depends on this</span><span class="ru">ASAP — дизайн демо зависит от этого</span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--gold-light); font-weight:600;"><span class="en">Ilya</span><span class="ru">Илья</span></td>
+        <td><span class="en">Schedule for regular sound verification calls</span><span class="ru">Расписание регулярных звонков по верификации звука</span></td>
+        <td><span class="en">Your ear validates every aggregation milestone. ✅ Song file — already have it!</span><span class="ru">Твой слух верифицирует каждый этап агрегации. ✅ Файл песни — уже есть!</span></td>
+        <td><span class="en">Let's agree on cadence</span><span class="ru">Согласуем каденцию</span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--gold-light); font-weight:600;"><span class="en">Bob</span><span class="ru">Лёва</span></td>
+        <td><span class="en">1-on-1 to set up sprint controls</span><span class="ru">1-на-1 для настройки спринт-контролей</span></td>
+        <td><span class="en">Governance environment for consistent delivery</span><span class="ru">Контрольная среда для стабильной поставки</span></td>
+        <td><span class="en">This week</span><span class="ru">На этой неделе</span></td>
+      </tr>
+      <tr>
+        <td style="color:var(--gold-light); font-weight:600;"><span class="en">GMT</span><span class="ru">Ярослав</span></td>
+        <td><span class="en">Connect us with Ilya Lukashev</span><span class="ru">Связать нас с Ильёй Лукашевым</span></td>
+        <td><span class="en">Musical direction for the aggregation quality</span><span class="ru">Музыкальное направление для качества агрегации</span></td>
+        <td><span class="en">✅ Call today 16:30 CET</span><span class="ru">✅ Звонок сегодня 16:30 CET</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Acceptance Criteria -->
+<div class="reveal">
+  <h2 class="section-title" style="font-size:1.3rem; margin-top:3rem;">
+    <span class="en">How to Know It's Done Right</span>
+    <span class="ru">Как понять, что сделано правильно</span>
+  </h2>
+
+  <h3 style="color:var(--teal-light); margin:1.5rem 0 0.8rem;">
+    <span class="en">Demo — Acceptance Criteria</span>
+    <span class="ru">Демо — Критерии приёмки</span>
+  </h3>
+  <div class="glass-card">
+    <ul style="list-style:none; padding:0;">
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">A partner can understand what Granat is within 60 seconds of opening the demo</span><span class="ru">Партнёр может понять, что такое Гранат, за 60 секунд после открытия демо</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">The full platform structure ("tree") is visible from the top level</span><span class="ru">Полная структура платформы («дерево») видна с верхнего уровня</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">A user can drill into any branch (voice, economy, community) for details</span><span class="ru">Пользователь может углубиться в любую ветку (голос, экономика, сообщество)</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">"Leave your voice" button works (records, saves, increments counter)</span><span class="ru">Кнопка «Оставь голос» работает (записывает, сохраняет, увеличивает счётчик)</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">The Granat song plays within the demo</span><span class="ru">Песня Граната воспроизводится внутри демо</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">Color palette feels celebratory and inviting, not dark and intimidating</span><span class="ru">Цветовая палитра ощущается праздничной и приглашающей, не тёмной и пугающей</span>
+      </li>
+      <li style="padding:0.5rem 0; color:var(--text-secondary);">
+        ☐ <span class="en">Works on mobile (GMT's primary use case for showing partners)</span><span class="ru">Работает на мобильном (основной сценарий GMT для показа партнёрам)</span>
+      </li>
+    </ul>
+  </div>
+
+  <h3 style="color:var(--purple-light); margin:2rem 0 0.8rem;">
+    <span class="en">Voice R&D — April Milestone Criteria</span>
+    <span class="ru">R&D голосов — Критерии апрельского этапа</span>
+  </h3>
+  <div class="glass-card">
+    <ul style="list-style:none; padding:0;">
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">Aggregation of 10+ voices on the Granat song sounds like a real choir (Ilya-validated)</span><span class="ru">Агрегация 10+ голосов на песне Граната звучит как настоящий хор (валидация Ильёй)</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">Pre-processing removes environmental noise without killing voice character</span><span class="ru">Пред-обработка убирает фоновый шум, не убивая характер голоса</span>
+      </li>
+      <li style="padding:0.5rem 0; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+        ☐ <span class="en">Post-processing smooths artifacts without making the output sound "mechanical"</span><span class="ru">Пост-обработка сглаживает артефакты, не делая результат «механическим»</span>
+      </li>
+      <li style="padding:0.5rem 0; color:var(--text-secondary);">
+        ☐ <span class="en">At least one pipeline produces consistent results on diverse input quality</span><span class="ru">Хотя бы один пайплайн даёт стабильный результат на разнокачественном входе</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Closing -->
+<div class="reveal" style="margin-top:3rem; padding:2rem; border-left:3px solid var(--coral); background:var(--coral-glow); border-radius:8px;">
+  <p style="color:var(--text-primary); font-style:italic;">
+    <span class="en">It was important for me to hear everyone on our last call. That's why I was all ears first — and then all hands, to turn your shared vision into a unified picture. This document is the first brick of that picture.</span>
+    <span class="ru">Мне было важно услышать каждого на нашем прошлом звонке. Поэтому я был ушами — а потом руками, чтобы превратить ваше видение в единую картину. Этот документ — первый кирпич этой картины.</span>
+  </p>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 7: FULL DOCUMENT
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-full">
+<div class="container full-doc">
+
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">Complete Vision Document</span><span class="ru">Полный документ видения</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">GRANAT: Current Vision Document</span>
+    <span class="ru">ГРАНАТ: Текущий документ видения</span>
+  </h1>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.3rem;">
+    <span class="en">Date: March 16, 2026 | Source: Vision Alignment Call (March 15, 2026) | Prepared by: Conny 5.0 (Strategy)</span>
+    <span class="ru">Дата: 16 марта 2026 | Источник: Звонок по выравниванию видения (15 марта 2026) | Подготовил: Conny 5.0 (Стратегия)</span>
+  </p>
+  <p style="font-size:0.8rem;color:var(--text-muted);">
+    <span class="en">Participants: GMT (Moshe/Yaroslav), Olga (OA), Alex Berezovsky (AB), Dima Levin, Hector Cryo (Ilya), Bob Lev</span>
+    <span class="ru">Участники: GMT (Моше/Ярослав), Ольга (ОА), Алекс Березовский (АБ), Дима Левин, Гектор Крио (Илья), Боб Лев</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section 1 -->
+<h2>1. <span class="en">Executive Summary</span><span class="ru">Краткая сводка</span></h2>
+<p><span class="en">Granat is evolving from a voice-aggregation music artifact into a full-scale digital nation-state with its own economy, identity system, and cultural infrastructure. The March 15 call achieved three critical outcomes: (1) separation of the demo/presentation track from the technology R&D track, (2) introduction of Olga as strategic/offline lead, and (3) crystallization of Alex's "Three Pillars" framework (Technology, Traffic, Economy) as the operating structure for all forward motion.</span><span class="ru">Гранат эволюционирует от артефакта агрегации голосов в полноценное цифровое государство с собственной экономикой, системой идентификации и культурной инфраструктурой. Звонок 15 марта достиг трёх критических результатов: (1) разделение трека демо/презентации от трека технологического R&D, (2) введение Ольги как стратегического/оффлайн лидера, и (3) кристаллизация фреймворка «Три Столпа» Алекса (Технология, Трафик, Экономика) как операционной структуры.</span></p>
+
+<p><strong><span class="en">What Granat Is Now:</span><span class="ru">Что такое Гранат сейчас:</span></strong> <span class="en">A voice-based participation platform that uses the human voice as the entry point to a new economic model. People record voices into a collective song, receive economic rewards (NFT/tokens), and become citizens of a self-governing digital ecosystem. The song is the door. The economy is the house. The technology is the foundation.</span><span class="ru">Голосовая платформа участия, использующая человеческий голос как точку входа в новую экономическую модель. Люди записывают голоса в коллективную песню, получают экономические вознаграждения (NFT/токены) и становятся гражданами самоуправляемой цифровой экосистемы. Песня — это дверь. Экономика — это дом. Технология — это фундамент.</span></p>
+
+<p><strong><span class="en">Key Shift:</span><span class="ru">Ключевой сдвиг:</span></strong> <span class="en">The demo must not wait for voice aggregation technology to mature. It shows "how life in Granat will work" as an interactive architectural plan. Technology R&D runs in parallel, decoupled from presentation timelines.</span><span class="ru">Демо не должно ждать созревания технологии агрегации голосов. Оно показывает «как будет устроена жизнь в Гранате» как интерактивный архитектурный план. R&D технологии идёт параллельно, отвязанный от сроков презентации.</span></p>
+
+<!-- Section 2 -->
+<h2>2. <span class="en">The Three Pillars (Alex's Framework)</span><span class="ru">Три Столпа (Фреймворк Алекса)</span></h2>
+
+<h3><span class="en">Pillar 1: Technology</span><span class="ru">Столп 1: Технология</span> <span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></h3>
+<p><span class="en">No existing codec handles peer-to-many voice aggregation at scale. Three separate pipelines under testing. PoC exists (16 professional voices aggregated). April target: good audio quality. Requirements: deterministic aggregation, 100-year storage, single-device reproducibility, any input quality, scale from 1 to 1 billion.</span><span class="ru">Ни один существующий кодек не обрабатывает агрегацию голосов peer-to-many в масштабе. Три отдельных пайплайна в тестировании. PoC есть (16 профессиональных голосов агрегированы). Цель на апрель: хорошее качество аудио. Требования: детерминированная агрегация, хранение 100 лет, воспроизводимость с одного устройства, любое качество ввода, масштаб от 1 до 1 миллиарда.</span></p>
+<blockquote>"Если мы поставим предельное количество параметров, 1 миллиард голосов, тогда мы его можем спокойно решить прямо сейчас, что именно это мы запечем потом на чип." — AB</blockquote>
+
+<p style="margin-top:1rem;"><strong>🆕 <span class="en">AB Manifesto (March 17, 2026) — Technology Formalization:</span><span class="ru">Манифест АБ (17 марта 2026) — Формализация технологии:</span></strong></p>
+<p><span class="en">Alex formalized the core technology as a paradigm shift: sound stored as <strong>compact parametric acoustic events</strong> (frequency, partials, amplitudes, phase references, aperiodics) — NOT as wave signals. 10-100x smaller than PCM with exact resynthesis capability. Key mechanisms: <strong>phase policy + cluster reduction + protective aggregator</strong> for solving phase interference at scale. <strong>Client-side/edge resynthesis</strong> — rendering on user device, not servers. <strong>Aperiodic anonymization</strong> for biometric privacy (GDPR compliance). <strong>Legal reproducibility</strong> — juridically defensible determinism. <strong>GPU/FPGA heavy-path</strong> optimization. Positioning: "Not compression technology — trust infrastructure for a new audio economy." Granat as <strong>protocol standard</strong> (canonical event spec + SDK), applicable beyond music: gaming, metaverse, telecom, streaming, education.</span><span class="ru">Алекс формализовал основную технологию как сдвиг парадигмы: звук хранится как <strong>компактные параметрические акустические события</strong> (частота, парциалы, амплитуды, фазовые опорные значения, апериодика) — НЕ как волновой сигнал. В 10-100 раз меньше PCM с возможностью точного ресинтеза. Ключевые механизмы: <strong>фазовая политика + кластерная редукция + защитный агрегатор</strong> для решения фазовой интерференции в масштабе. <strong>Ресинтез на устройстве клиента</strong> — рендеринг на устройстве пользователя, не на серверах. <strong>Анонимизация апериодической составляющей</strong> для биометрической приватности (GDPR). <strong>Юридическая воспроизводимость</strong> — юридически защитимый детерминизм. Оптимизация <strong>GPU/FPGA heavy-path</strong>. Позиционирование: «Не технология сжатия звука — инфраструктура доверия для новой аудиоэкономики.» Гранат как <strong>стандарт протокола</strong> (каноническая спецификация событий + SDK), применимый за пределами музыки: игры, метавселенная, телеком, стриминг, образование.</span></p>
+<blockquote>"GRANAT — не технология сжатия звука, это инфраструктура доверия для новой аудиоэкономики." — AB, <span class="en">Manifesto (March 17)</span><span class="ru">Манифест (17 марта)</span></blockquote>
+
+<h3><span class="en">Pillar 2: Traffic</span><span class="ru">Столп 2: Трафик</span> <span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></h3>
+<p><span class="en">Influencer-first. 100M via leaders, 900M via tail effect. Seven Captains for seven life domains. Barabasi-Albert scale-free network model.</span><span class="ru">Через инфлюенсеров. 100M через лидеров, 900M через хвостовой эффект. Семь Капитанов для семи сфер жизни. Безмасштабная сетевая модель Барабаши-Альберта.</span></p>
+
+<h3><span class="en">Pillar 3: Economy</span><span class="ru">Столп 3: Экономика</span> <span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></h3>
+<p><span class="en">Technology brings people in. Traffic brings people in. Economy keeps them. No one-way streets. Every interaction is bidirectional with immediate reward: NFT/token, acoustic passport, league entry, project launching ability.</span><span class="ru">Технология приводит людей. Трафик приводит людей. Экономика удерживает. Никаких односторонних дорог. Каждое взаимодействие двунаправлено с немедленным вознаграждением: NFT/токен, акустический паспорт, вход в лигу, возможность запуска проектов.</span></p>
+<blockquote>"Гранат — страна со своей экономикой и взаимодействием. Акустический паспорт, создание экономической деятельности." — AB</blockquote>
+
+<!-- Section 3 -->
+<h2>3. <span class="en">The Platform Concept ("The Tree")</span><span class="ru">Концепция платформы («Дерево»)</span></h2>
+<p><span class="en">The call converged on the tree metaphor. Five trees referenced: Sephirot (OA/GMT), Yggdrasil (Dima), Merkle Tree (AB), Barabasi-Albert Graph (AB), Tree of Knowledge to Tree of Life (GMT). The tree is simultaneously: product structure, technology structure, and process structure. Hierarchical, not linear. Navigation exists within structure.</span><span class="ru">Звонок сошёлся на метафоре дерева. Пять деревьев: Сфирот (ОА/GMT), Иггдрасиль (Дима), Дерево Меркла (АБ), Граф Барабаши-Альберта (АБ), Древо Познания к Древу Жизни (GMT). Дерево одновременно: структура продукта, технологии и процесса. Иерархическое, не линейное. Навигация существует внутри структуры.</span></p>
+<blockquote>"Система без структуры не живёт, а структура может существовать сама по себе." — AB</blockquote>
+
+<!-- Section 4 -->
+<h2>4. <span class="en">User Journey</span><span class="ru">Путь пользователя</span></h2>
+<p><strong><span class="en">Entry:</span><span class="ru">Вход:</span></strong> <span class="en">User encounters Granat via influencer. Arrives at platform — must immediately understand where to leave voice. "Lazy" UX: one button, record, done. 3-5 seconds to engage.</span><span class="ru">Пользователь узнаёт о Гранате через инфлюенсера. Приходит на платформу — должен сразу понять, где оставить голос. «Ленивый» UX: одна кнопка, запись, готово. 3-5 секунд на вовлечение.</span></p>
+<p><strong><span class="en">Record:</span><span class="ru">Запись:</span></strong> <span class="en">Sings part of Granat song. Main song plays "in front" — user's voice goes "behind." Any device, any environment.</span><span class="ru">Поёт часть песни Граната. Главная песня играет «впереди» — голос пользователя идёт «позади». Любое устройство, любые условия.</span></p>
+<p><strong><span class="en">Reward:</span><span class="ru">Вознаграждение:</span></strong> <span class="en">Immediately: NFT shard, token allocation, or voucher. The bidirectional contract.</span><span class="ru">Немедленно: NFT-осколок, распределение токенов или ваучер. Двусторонний контракт.</span></p>
+<p><strong><span class="en">Return:</span><span class="ru">Возврат:</span></strong> <span class="en">Track voice over time. Counter shows collected voices. Within ~24 hours, hear your voice integrated into collective song.</span><span class="ru">Отслеживать голос со временем. Счётчик показывает собранные голоса. В течение ~24 часов услышать свой голос, интегрированный в коллективную песню.</span></p>
+<p><strong><span class="en">Grow:</span><span class="ru">Рост:</span></strong> <span class="en">Move between leagues (DDL). Launch projects. Acoustic passport enables economic activity. UPI rewards compound.</span><span class="ru">Переход между лигами (DDL). Запуск проектов. Акустический паспорт позволяет экономическую деятельность. Награды UPI накапливаются.</span></p>
+
+<!-- Section 5 -->
+<h2>5. <span class="en">Economic Model</span><span class="ru">Экономическая модель</span></h2>
+<p><strong>UPI</strong> <span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span>: <span class="en">In the AI age, passive income (UBI) sustains bodies but kills purpose. UPI sustains both — you earn by participating, not by existing. Voice is proof of participation; blockchain is the ledger.</span><span class="ru">В эпоху ИИ пассивный доход (UBI) поддерживает тело, но убивает цель. UPI поддерживает оба — зарабатываешь участием, не существованием. Голос — подтверждение участия; блокчейн — реестр.</span></p>
+<p><strong><span class="en">Token Infrastructure:</span><span class="ru">Токен-инфраструктура:</span></strong> GVP (TIP-4 NFT on TON — fact receipt), GRT (TIP-3 utility — staking/licensing), PDM (~$2 refundable anti-Sybil deposit).</p>
+<p><strong><span class="en">Acoustic Passport:</span><span class="ru">Акустический паспорт:</span></strong> <span class="en">12-parameter voice fingerprint as biometric identity. Enables economic activity, verification, cross-league movement, project launching.</span><span class="ru">12-параметровый голосовой отпечаток как биометрическая идентификация. Позволяет экономическую деятельность, верификацию, межлиговое перемещение, запуск проектов.</span></p>
+<blockquote>"Это, правда, новая форма государственности, которую вообще, в принципе, можно предложить в дальнейшем, потому что она единственно жизнеспособна в новых реалиях." — OA</blockquote>
+
+<!-- Section 6 -->
+<h2>6. <span class="en">Voice Technology Status</span><span class="ru">Статус технологии голоса</span></h2>
+<p><span class="en"><strong>Three Pipelines</strong> under active development. Each composed of different models and approaches — built-in Plan B. Focus: (1) voice decomposition into 12 parameters, (2) parameter aggregation, (3) resynthesis to audio.</span><span class="ru"><strong>Три пайплайна</strong> в активной разработке. Каждый из разных моделей и подходов — встроенный План Б. Фокус: (1) декомпозиция голоса на 12 параметров, (2) агрегация параметров, (3) ресинтез в аудио.</span></p>
+<p><span class="en"><strong>Current capabilities:</strong> PoC with 16 professional voices. 1 voice to 7 voices library. Two test recordings (hard + clean case). Pre/post-processing, harmonics, noise removal in development.</span><span class="ru"><strong>Текущие возможности:</strong> PoC с 16 профессиональными голосами. Библиотека 1 голос в 7 голосов. Две тестовые записи (сложный + чистый случай). Пре/постобработка, гармоники, шумоподавление в разработке.</span></p>
+<p><span class="en"><strong>April target:</strong> Good audio quality. "Aggressive" but committed. Sound quality first, infrastructure second.</span><span class="ru"><strong>Цель на апрель:</strong> Хорошее качество аудио. «Агрессивный», но принятый срок. Сначала качество звука, потом инфраструктура.</span></p>
+<blockquote>"Мы получаем толщину этого хора, а не шум." — AB (<span class="en">on interference compensation</span><span class="ru">об интерференционной компенсации</span>)</blockquote>
+
+<!-- Section 7 -->
+<h2>7. <span class="en">Cultural &amp; Philosophical Framework</span><span class="ru">Культурный и философский фреймворк</span></h2>
+<p><span class="en">GMT frames Granat through sacred symbolism: the pomegranate (fruit of the Tree of Knowledge returning to the Tree of Life), voice as divine breath, "Diabolos" as divider. OA introduced the Sephirot framework (10 spheres, 50 primary interactions) and the Rosa Mundi reference. AB positioned Granat within the "sixth technological order" transition. Dima contributed Yggdrasil. The core spiritual arc: from knowledge to life, from separation to reunion.</span><span class="ru">GMT обрамляет Гранат через сакральную символику: гранат (плод Древа Познания, возвращающийся к Древу Жизни), голос как божественное дыхание, «Диаволос» как разделитель. ОА ввела фреймворк Сфирот (10 сфер, 50 первичных взаимодействий) и ссылку на Розу Мира. АБ позиционировал Гранат в «переходе к шестому технологическому укладу». Дима внёс Иггдрасиль. Ключевая духовная арка: от познания к жизни, от разделения к воссоединению.</span></p>
+
+<!-- Section 8 -->
+<h2>8. <span class="en">Go-to-Market Strategy</span><span class="ru">Стратегия выхода на рынок</span></h2>
+<p><span class="en"><strong>Core shift:</strong> Influencer-first, not institutional. Granat must NOT depend on external events it cannot control (FIFA, Olympics). Epstein files decimated partner lists. Large institutional systems are collapsing — "the baobab that falls." Approach FIFA as a "floating plugin" — connect, exchange, move on. Bloggers on stadiums for organic viral spread. Seven Captains for seven life domains. 100M via leaders, 900M via tail effect.</span><span class="ru"><strong>Ключевой сдвиг:</strong> Через инфлюенсеров, не через институции. Гранат НЕ ДОЛЖЕН зависеть от внешних событий, которые не может контролировать (FIFA, Олимпиада). Файлы Эпштейна уничтожили списки партнёров. Крупные институциональные системы рушатся — «баобаб, который падает». Подходить к FIFA как «плавающий плагин» — подключиться, обменяться, пойти дальше. Блогеры на стадионах для органического вирусного распространения. Семь Капитанов для семи сфер жизни. 100M через лидеров, 900M через хвостовой эффект.</span></p>
+
+<!-- Section 9 -->
+<h2>9. <span class="en">Offline Strategy</span><span class="ru">Оффлайн-стратегия</span></h2>
+<p><span class="en">OA as offline PM. GranatFest on 5 continents. All offline currently paused until April tech milestone. Only after technology delivers can offline planning resume (partner negotiations, event dates, travel). QR codes and stadium activations as future vision.</span><span class="ru">ОА как оффлайн менеджер проекта. GranatFest на 5 континентах. Вся оффлайн-активность пока приостановлена до технологического рубежа в апреле. Только после результатов технологии можно возобновить планирование (переговоры с партнёрами, даты мероприятий, поездки). QR-коды и стадионные активации как будущее видение.</span></p>
+<blockquote>"У нас вся активность оффлайн, она пока стоит, мы ее не можем планировать." — OA</blockquote>
+
+<!-- Section 10 -->
+<h2>10. <span class="en">The Song</span><span class="ru">Песня</span></h2>
+<p><span class="en">Main song (GMT's composition) stays in front. Aggregated voices sit behind, never overpowering. Stadium effect — a barrel of sound as general background. Voice quality variability is deliberate (worst case is design case). As voices increase, interference causes compensation — thickness, not noise.</span><span class="ru">Главная песня (композиция GMT) остаётся впереди. Агрегированные голоса стоят позади, никогда не перебивая. Стадионный эффект — бочка звука как общий фон. Вариативность качества голосов намеренная (худший случай — проектный случай). С ростом числа голосов интерференция вызывает компенсацию — толщина, не шум.</span></p>
+<blockquote>"Песня не должна меняться. Настолько песня должна быть выставлена вперед, а голоса стоять сзади за ней." — OA</blockquote>
+
+<!-- Section 11 -->
+<h2>11. <span class="en">The Demo / Presentation</span><span class="ru">Демо / Презентация</span></h2>
+<p><span class="en"><strong>Separation of demo from technology</strong> — the most consequential decision. Demo track: interactive visualization of the full tree. Voice tech track: three pipelines, audio quality, April target.</span><span class="ru"><strong>Разделение демо от технологии</strong> — самое значимое решение. Трек демо: интерактивная визуализация полного дерева. Трек технологии голоса: три пайплайна, качество аудио, цель на апрель.</span></p>
+<p><span class="en"><strong>Demo must show:</strong> full tree, user journey, economic mechanics, navigation, interactive elements, song playback, voice recording button (placeholder OK), counter, brand identity.</span><span class="ru"><strong>Демо должно показать:</strong> полное дерево, путь пользователя, экономические механики, навигацию, интерактивные элементы, воспроизведение песни, кнопку записи голоса (заглушка ОК), счётчик, бренд-идентичность.</span></p>
+<p><span class="en"><strong>Demo must NOT:</strong> wait for real-time aggregation, show voice processing as core feature, be a "vinaigrette," require understanding technology to be impressed.</span><span class="ru"><strong>Демо НЕ ДОЛЖНО:</strong> ждать агрегации в реальном времени, показывать обработку голоса как основную фичу, быть «винегретом», требовать понимания технологии для впечатления.</span></p>
+<blockquote>"Демо - первый конечный продукт. Первый старт к МВП." — OA</blockquote>
+
+<!-- Section 12 — Idea Inventory -->
+<h2>12. <span class="en">Idea Inventory</span><span class="ru">Инвентаризация идей</span></h2>
+
+<h3><span class="en">Technology Ideas</span><span class="ru">Технологические идеи</span></h3>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Idea</span><span class="ru">Идея</span></th><th><span class="en">Status</span><span class="ru">Статус</span></th><th><span class="en">Champion</span><span class="ru">Инициатор</span></th></tr></thead>
+<tbody>
+<tr><td>T1</td><td><span class="en">Three separate aggregation pipelines in parallel</span><span class="ru">Три отдельных пайплайна агрегации параллельно</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>T2</td><td><span class="en">12-parameter voice decomposition</span><span class="ru">12-параметровая декомпозиция голоса</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB, Dima</td></tr>
+<tr><td>T3</td><td><span class="en">Bidirectional verification</span><span class="ru">Двунаправленная верификация</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T4</td><td><span class="en">Voice multiplication: 1 &rarr; 7 voices</span><span class="ru">Умножение голоса: 1 &rarr; 7 голосов</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>T5</td><td><span class="en">Pre-processing: clean non-voice artifacts</span><span class="ru">Предобработка: очистка не-голосовых артефактов</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>T6</td><td><span class="en">Post-processing: beautify final output</span><span class="ru">Постобработка: улучшение финального вывода</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>T7</td><td><span class="en">ASIC chip (static model, 160K tokens)</span><span class="ru">ASIC чип (статическая модель, 160K токенов)</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td><td>AB</td></tr>
+<tr><td>T8-T11</td><td><span class="en">Compression ratio, DeepFilterNet3, Welford's algo, BLAKE3+TON</span><span class="ru">Степень сжатия, DeepFilterNet3, алгоритм Уэлфорда, BLAKE3+TON</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima, AB</td></tr>
+<tr><td>T12</td><td><span class="en">Interference-based compensation at scale</span><span class="ru">Интерференционная компенсация в масштабе</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T13</td><td><span class="en">Sound quality first, infrastructure second</span><span class="ru">Сначала качество звука, потом инфраструктура</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>T14</td><td><span class="en">Progressive demo (700 &rarr; 7K &rarr; 7M)</span><span class="ru">Прогрессивное демо (700 &rarr; 7K &rarr; 7M)</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>Hector Cryo</td></tr>
+<tr><td colspan="4" style="font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;padding-top:0.6rem;border-top:2px solid var(--border-medium);">🆕 <span class="en">FROM AB MANIFESTO — March 17, 2026</span><span class="ru">ИЗ МАНИФЕСТА АБ — 17 марта 2026</span></td></tr>
+<tr><td>T15</td><td><span class="en">Acoustic events paradigm (10-100x smaller than PCM)</span><span class="ru">Парадигма акустических событий (в 10-100 раз меньше PCM)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T16</td><td><span class="en">Phase policy + cluster reduction + protective aggregator</span><span class="ru">Фазовая политика + кластерная редукция + защитный агрегатор</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T17</td><td><span class="en">Client-side / edge resynthesis</span><span class="ru">Ресинтез на стороне клиента</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T18</td><td><span class="en">GPU/FPGA optimized heavy-path</span><span class="ru">Оптимизированный тяжёлый путь на GPU/FPGA</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T19</td><td><span class="en">Aperiodic anonymization (biometric privacy)</span><span class="ru">Анонимизация апериодики (биометрическая приватность)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T20</td><td><span class="en">Legal reproducibility</span><span class="ru">Юридическая воспроизводимость</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>T21</td><td><span class="en">Canonical event spec + SDK (protocol standard)</span><span class="ru">Каноническая спецификация событий + SDK (стандарт протокола)</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>V1</td><td><span class="en">Expanded verticals: gaming, metaverse, telecom, streaming, education</span><span class="ru">Расширенные вертикали: игры, метавселенная, телеком, стриминг, образование</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>P11</td><td><span class="en">"Trust infrastructure for new audio economy" positioning</span><span class="ru">Позиционирование «Инфраструктура доверия для новой аудиоэкономики»</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+</tbody>
+</table>
+
+<h3><span class="en">Product &amp; Platform Ideas</span><span class="ru">Продуктовые и платформенные идеи</span></h3>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Idea</span><span class="ru">Идея</span></th><th><span class="en">Status</span><span class="ru">Статус</span></th><th><span class="en">Champion</span><span class="ru">Инициатор</span></th></tr></thead>
+<tbody>
+<tr><td>P1</td><td><span class="en">Demo as interactive "tree"</span><span class="ru">Демо как интерактивное «дерево»</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>OA, GMT, AB</td></tr>
+<tr><td>P2</td><td><span class="en">Voice recording button (functional or placeholder)</span><span class="ru">Кнопка записи голоса (работающая или заглушка)</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima, GMT</td></tr>
+<tr><td>P3</td><td><span class="en">Voice counter</span><span class="ru">Счётчик голосов</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>P4</td><td><span class="en">Song playback in demo</span><span class="ru">Воспроизведение песни в демо</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>OA</td></tr>
+<tr><td>P5</td><td><span class="en">Hierarchical navigation</span><span class="ru">Иерархическая навигация</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>P6</td><td><span class="en">"Lazy" UX — one button</span><span class="ru">«Ленивый» UX — одна кнопка</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>Dima</td></tr>
+<tr><td>P7-P10</td><td><span class="en">Active/inactive cubes, interactive logo, voice tracking, manifesto as base</span><span class="ru">Активные/неактивные кубики, интерактивный логотип, отслеживание голоса, манифест как основа</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td><span class="en">Various</span><span class="ru">Разные</span></td></tr>
+</tbody>
+</table>
+
+<h3><span class="en">Economic Ideas</span><span class="ru">Экономические идеи</span></h3>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Idea</span><span class="ru">Идея</span></th><th><span class="en">Status</span><span class="ru">Статус</span></th><th><span class="en">Champion</span><span class="ru">Инициатор</span></th></tr></thead>
+<tbody>
+<tr><td>E1</td><td><span class="en">Immediate NFT/token reward</span><span class="ru">Мгновенное вознаграждение NFT/токен</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>E2-E3</td><td><span class="en">GRT utility token + GVP proof NFT</span><span class="ru">GRT утилитарный токен + GVP NFT-подтверждение</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>E4</td><td><span class="en">Acoustic Passport</span><span class="ru">Акустический паспорт</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB, OA</td></tr>
+<tr><td>E5</td><td><span class="en">Universal Participation Income</span><span class="ru">Универсальный Доход от Участия</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>E6</td><td><span class="en">PDM $2 anti-Sybil deposit</span><span class="ru">PDM $2 анти-Сибил депозит</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>AB</td></tr>
+<tr><td>E7</td><td><span class="en">DDL governance</span><span class="ru">Управление DDL</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>E8-E11</td><td><span class="en">Stock-for-newborn analogy, country metaphor, project launching, Duchesse vs Coca-Cola</span><span class="ru">Аналогия «акция для новорождённого», метафора страны, запуск проектов, Дюшес vs Coca-Cola</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td><td>AB, OA</td></tr>
+</tbody>
+</table>
+
+<h3><span class="en">Go-to-Market Ideas</span><span class="ru">Идеи выхода на рынок</span></h3>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Idea</span><span class="ru">Идея</span></th><th><span class="en">Status</span><span class="ru">Статус</span></th><th><span class="en">Champion</span><span class="ru">Инициатор</span></th></tr></thead>
+<tbody>
+<tr><td>G1</td><td><span class="en">Influencer-first acquisition</span><span class="ru">Привлечение через инфлюенсеров</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>OA</td></tr>
+<tr><td>G2</td><td><span class="en">"Floating plugin" to FIFA</span><span class="ru">«Плавающий плагин» к FIFA</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>OA</td></tr>
+<tr><td>G3</td><td><span class="en">Seven Captains</span><span class="ru">Семь Капитанов</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB</td></tr>
+<tr><td>G4-G8</td><td><span class="en">Bloggers on stadiums, QR codes, ticket scanning, TV voting, 100M&rarr;900M tail</span><span class="ru">Блогеры на стадионах, QR-коды, сканирование билетов, ТВ-голосование, хвост 100M&rarr;900M</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>AB, OA</td></tr>
+<tr><td>G9-G10</td><td><span class="en">Epstein-files risk mitigation, "baobab" independence principle</span><span class="ru">Снижение рисков файлов Эпштейна, принцип независимости от «баобабов»</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>OA</td></tr>
+</tbody>
+</table>
+
+<h3><span class="en">Cultural, Offline &amp; Music Ideas</span><span class="ru">Культурные, оффлайн и музыкальные идеи</span></h3>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Idea</span><span class="ru">Идея</span></th><th><span class="en">Status</span><span class="ru">Статус</span></th><th><span class="en">Champion</span><span class="ru">Инициатор</span></th></tr></thead>
+<tbody>
+<tr><td>C1-C3</td><td><span class="en">Sephirot, 22 Hebrew letters, Yggdrasil as structural models</span><span class="ru">Сфирот, 22 буквы иврита, Иггдрасиль как структурные модели</span></td><td><span class="tag proposed"><span class="en">PROPOSED</span><span class="ru">ПРЕДЛОЖЕНО</span></span></td><td>OA, Dima</td></tr>
+<tr><td>C4-C8</td><td><span class="en">Tuning fork, new statehood, sixth order, Rosa Mundi, Ryazanov</span><span class="ru">Камертон, новая государственность, шестой уклад, Роза Мира, Рязанов</span></td><td><span class="tag aspirational"><span class="en">ASPIRATIONAL</span><span class="ru">ПЕРСПЕКТИВНО</span></span></td><td>OA, AB</td></tr>
+<tr><td>C9-C10</td><td><span class="en">Tree of Knowledge &rarr; Tree of Life, music as elevation</span><span class="ru">Древо Познания &rarr; Древо Жизни, музыка как возвышение</span></td><td><span class="tag decided"><span class="en">DECIDED</span><span class="ru">РЕШЕНО</span></span></td><td>GMT</td></tr>
+<tr><td>O1-O5</td><td><span class="en">GranatFest, offline paused, stadium activations, film, celebrity due diligence</span><span class="ru">GranatFest, оффлайн приостановлен, стадионные активации, фильм, проверка знаменитостей</span></td><td><span class="en">Mixed</span><span class="ru">Смешанный</span></td><td><span class="en">Various</span><span class="ru">Разные</span></td></tr>
+<tr><td>M1-M7</td><td><span class="en">Song in front, stadium effect, own song, Lukashev, worst-case design, 1&rarr;7 voices, progressive demo</span><span class="ru">Песня впереди, стадионный эффект, своя песня, Лукашев, дизайн по худшему случаю, 1&rarr;7 голосов, прогрессивное демо</span></td><td><span class="en">Mixed</span><span class="ru">Смешанный</span></td><td><span class="en">Various</span><span class="ru">Разные</span></td></tr>
+</tbody>
+</table>
+
+<!-- Section 13 -->
+<h2>13. <span class="en">Open Questions &amp; Gaps</span><span class="ru">Открытые вопросы и пробелы</span></h2>
+<h4><span class="en">Technical</span><span class="ru">Технические</span></h4>
+<ol>
+<li><span class="en">Which pipeline wins? Target: end of April.</span><span class="ru">Какой пайплайн победит? Цель: конец апреля.</span></li>
+<li><span class="en">Spectral vs. non-spectral approach — no conclusion yet.</span><span class="ru">Спектральный vs. не-спектральный подход — пока нет выводов.</span></li>
+<li><span class="en">Compression ratio — AB flagged as "not good enough."</span><span class="ru">Степень сжатия — АБ отметил как «категорически не устраивает».</span></li>
+<li><span class="en">Post-aggregation mechanical artifacts — severity?</span><span class="ru">Механические артефакты после агрегации — насколько серьёзны?</span></li>
+<li><span class="en">Real-time vs. batch aggregation — latency target?</span><span class="ru">Агрегация в реальном времени vs. пакетная — целевая задержка?</span></li>
+</ol>
+<h4><span class="en">Product</span><span class="ru">Продуктовые</span></h4>
+<ol start="6">
+<li><span class="en">Demo timeline post-direction-change.</span><span class="ru">Таймлайн демо после смены направления.</span></li>
+<li><span class="en">Which demo survives (mobile vs. desktop)?</span><span class="ru">Какое демо выживет (мобильное vs. десктопное)?</span></li>
+<li><span class="en">Color palette — not finalized.</span><span class="ru">Цветовая палитра — не утверждена.</span></li>
+<li><span class="en">Song integration — recording button: functional vs. placeholder?</span><span class="ru">Интеграция песни — кнопка записи: рабочая vs. заглушка?</span></li>
+</ol>
+<h4><span class="en">Strategic</span><span class="ru">Стратегические</span></h4>
+<ol start="10">
+<li><span class="en">Who are the "big people"? Industry/portrait needed.</span><span class="ru">Кто «большие люди»? Нужна индустрия/портрет.</span></li>
+<li><span class="en">Seven Captains — no candidates identified.</span><span class="ru">Семь Капитанов — кандидаты не определены.</span></li>
+<li><span class="en">FIFA "floating plugin" — what operationally?</span><span class="ru">FIFA «плавающий плагин» — что конкретно?</span></li>
+<li><span class="en">Offline — depends entirely on April milestone.</span><span class="ru">Оффлайн — полностью зависит от рубежа в апреле.</span></li>
+</ol>
+<h4><span class="en">Contradictions to Monitor</span><span class="ru">Противоречия для мониторинга</span></h4>
+<ol start="14">
+<li><span class="en">Alex's structure document — help needed?</span><span class="ru">Документ структуры Алекса — нужна помощь?</span></li>
+<li><span class="en">GMT wants voice recording vs. OA says remove it. Middle ground proposed but not finalized.</span><span class="ru">GMT хочет запись голоса vs. ОА говорит убрать. Компромисс предложен, но не утверждён.</span></li>
+<li><span class="en">"Simple lazy UX" vs. "full tree with all interactions" — requires careful layering.</span><span class="ru">«Простой ленивый UX» vs. «полное дерево со всеми взаимодействиями» — требует аккуратного наложения слоёв.</span></li>
+</ol>
+
+<!-- Sections 14-16 -->
+<h2>14. <span class="en">Immediate Next Steps</span><span class="ru">Ближайшие шаги</span></h2>
+<table class="data-table">
+<thead><tr><th>#</th><th><span class="en">Action</span><span class="ru">Действие</span></th><th><span class="en">Owner</span><span class="ru">Ответственный</span></th><th><span class="en">Deadline</span><span class="ru">Срок</span></th></tr></thead>
+<tbody>
+<tr><td>1</td><td><span class="en">Draw full hierarchical tree structure</span><span class="ru">Нарисовать полную иерархическую структуру дерева</span></td><td>AB</td><td>ASAP</td></tr>
+<tr><td>2</td><td><span class="en">✅ Switch demo to Granat's own song</span><span class="ru">✅ Переключить демо на собственную песню Граната</span></td><td>Dima</td><td><span class="en">✅ Done</span><span class="ru">✅ Готово</span></td></tr>
+<tr><td>3</td><td><span class="en">Revise demo into interactive manifesto with tree</span><span class="ru">Переделать демо в интерактивный манифест с деревом</span></td><td>Dima</td><td><span class="en">Sprint end</span><span class="ru">Конец спринта</span></td></tr>
+<tr><td>4</td><td><span class="en">Continue 3-pipeline R&D toward April quality</span><span class="ru">Продолжить R&D 3 пайплайнов к апрельскому качеству</span></td><td>Dima</td><td><span class="en">End April</span><span class="ru">Конец апреля</span></td></tr>
+<tr><td>5</td><td><span class="en">Connect team with Ilya Lukashev</span><span class="ru">Связать команду с Ильёй Лукашевым</span></td><td>GMT</td><td><span class="en">✅ Today 16:30 CET</span><span class="ru">✅ Сегодня 16:30 CET</span></td></tr>
+<tr><td>6</td><td><span class="en">Olga-Dima timeline coordination</span><span class="ru">Координация сроков Ольга-Дима</span></td><td>OA, Dima</td><td><span class="en">Ongoing</span><span class="ru">Постоянно</span></td></tr>
+<tr><td>7</td><td><span class="en">GMT enters 1.5-month studio phase</span><span class="ru">GMT входит в 1.5-месячную студийную фазу</span></td><td>GMT</td><td><span class="en">Imminent</span><span class="ru">В ближайшее время</span></td></tr>
+<tr><td>8</td><td><span class="en">Summary document of all decisions</span><span class="ru">Итоговый документ всех решений</span></td><td>Dima</td><td><span class="en">Today</span><span class="ru">Сегодня</span></td></tr>
+</tbody>
+</table>
+
+<h2>15. <span class="en">Role Clarity</span><span class="ru">Ясность ролей</span></h2>
+<table class="data-table">
+<thead><tr><th><span class="en">Person</span><span class="ru">Человек</span></th><th><span class="en">Role</span><span class="ru">Роль</span></th><th><span class="en">Focus</span><span class="ru">Фокус</span></th></tr></thead>
+<tbody>
+<tr><td><strong>GMT</strong></td><td><span class="en">Visionary, Creative Director</span><span class="ru">Визионер, Креативный директор</span></td><td><span class="en">Music, high-level relationships, spiritual direction. 1.5-month studio.</span><span class="ru">Музыка, высокоуровневые связи, духовное направление. 1.5 месяца в студии.</span></td></tr>
+<tr><td><strong><span class="en">Olga</span><span class="ru">Ольга</span></strong></td><td><span class="en">Strategic/Offline PM</span><span class="ru">Стратегический/оффлайн ПМ</span></td><td><span class="en">Structure, offline events, partners, presentation strategy.</span><span class="ru">Структура, оффлайн-мероприятия, партнёры, стратегия презентации.</span></td></tr>
+<tr><td><strong>Alex (AB)</strong></td><td><span class="en">Tech Architect, Economy</span><span class="ru">Тех. архитектор, Экономика</span></td><td><span class="en">Three Pillars, token economy, algorithms, hierarchy.</span><span class="ru">Три Столпа, токен-экономика, алгоритмы, иерархия.</span></td></tr>
+<tr><td><strong>Dima</strong></td><td><span class="en">Delivery Lead, AI Lead</span><span class="ru">Лидер поставки, AI лидер</span></td><td><span class="en">Pipeline dev, demo execution, team management.</span><span class="ru">Разработка пайплайнов, исполнение демо, управление командой.</span></td></tr>
+<tr><td><strong><span class="en">Ilya</span><span class="ru">Илья</span></strong></td><td><span class="en">Music &amp; Sound</span><span class="ru">Музыка и звук</span></td><td><span class="en">Audio quality, musical direction, composition-layer insights.</span><span class="ru">Качество аудио, музыкальное направление, инсайты композиционного слоя.</span></td></tr>
+<tr><td><strong>Bob</strong></td><td><span class="en">QA, Project Control</span><span class="ru">QA, контроль проекта</span></td><td><span class="en">Quality observation, governance, sprint oversight.</span><span class="ru">Наблюдение за качеством, управление, контроль спринтов.</span></td></tr>
+</tbody>
+</table>
+
+<h2>16. <span class="en">Confidence Assessment</span><span class="ru">Оценка уверенности</span></h2>
+<table class="data-table">
+<thead><tr><th><span class="en">Area</span><span class="ru">Область</span></th><th><span class="en">Confidence</span><span class="ru">Уверенность</span></th><th><span class="en">Rationale</span><span class="ru">Обоснование</span></th></tr></thead>
+<tbody>
+<tr><td><span class="en">Strategic direction (Three Pillars)</span><span class="ru">Стратегическое направление (Три Столпа)</span></td><td style="color:var(--teal);font-weight:700;"><span class="en">HIGH</span><span class="ru">ВЫСОКАЯ</span></td><td><span class="en">Unanimous agreement, clear framework</span><span class="ru">Единогласное согласие, ясный фреймворк</span></td></tr>
+<tr><td><span class="en">Demo as separate track</span><span class="ru">Демо как отдельный трек</span></td><td style="color:var(--teal);font-weight:700;"><span class="en">HIGH</span><span class="ru">ВЫСОКАЯ</span></td><td><span class="en">Explicit consensus</span><span class="ru">Явный консенсус</span></td></tr>
+<tr><td><span class="en">April technology milestone</span><span class="ru">Технологическая веха в апреле</span></td><td style="color:var(--gold);font-weight:700;"><span class="en">MEDIUM</span><span class="ru">СРЕДНЯЯ</span></td><td><span class="en">"Aggressive"; three pipelines mitigate risk</span><span class="ru">«Агрессивный»; три пайплайна снижают риск</span></td></tr>
+<tr><td><span class="en">Economic model (UPI/tokens)</span><span class="ru">Экономическая модель (UPI/токены)</span></td><td style="color:var(--gold);font-weight:700;"><span class="en">MEDIUM</span><span class="ru">СРЕДНЯЯ</span></td><td><span class="en">Well-documented but untested</span><span class="ru">Хорошо задокументировано, но не протестировано</span></td></tr>
+<tr><td><span class="en">Influencer-first GTM</span><span class="ru">GTM через инфлюенсеров</span></td><td style="color:var(--gold);font-weight:700;"><span class="en">MED-HIGH</span><span class="ru">СРЕДНЕ-ВЫС</span></td><td><span class="en">Strategically sound; depends on GMT network</span><span class="ru">Стратегически обоснованно; зависит от сети GMT</span></td></tr>
+<tr><td><span class="en">Offline events</span><span class="ru">Оффлайн-мероприятия</span></td><td style="color:var(--crimson-bright);font-weight:700;"><span class="en">LOW</span><span class="ru">НИЗКАЯ</span></td><td><span class="en">Entirely paused</span><span class="ru">Полностью приостановлены</span></td></tr>
+<tr><td><span class="en">1B voices at scale</span><span class="ru">1 млрд голосов в масштабе</span></td><td style="color:var(--crimson-bright);font-weight:700;"><span class="en">LOW</span><span class="ru">НИЗКАЯ</span></td><td><span class="en">Aspirational; no path from PoC to even 10K</span><span class="ru">Желаемое; нет пути даже от PoC до 10K</span></td></tr>
+<tr><td><span class="en">"Country" / statehood</span><span class="ru">«Страна» / государственность</span></td><td style="color:var(--purple-light);font-weight:700;"><span class="en">SPECULATIVE</span><span class="ru">ГИПОТЕТИЧНО</span></td><td><span class="en">Inspiring but no governance/legal design</span><span class="ru">Вдохновляюще, но нет дизайна управления/права</span></td></tr>
+</tbody>
+</table>
+
+<div class="divider"></div>
+
+<div style="text-align:center;padding:2rem 0;color:var(--text-muted);font-size:0.8rem;">
+  <p style="font-style:italic;color:var(--gold-light);margin-bottom:0.5rem;">
+    <span class="en">"Not a single idea was left without proper focus."</span>
+    <span class="ru">"Ни одна из идей не осталась без должного фокуса."</span>
+  </p>
+  <p><strong>GRANAT</strong> — <span class="en">One Billion Voices. One Song.</span><span class="ru">Миллиард голосов. Одна песня.</span> | March 16, 2026 | Confidential</p>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER + JS
+     ═══════════════════════════════════════════ -->
+<footer style="background:var(--bg-void);border-top:1px solid var(--border-subtle);color:var(--text-muted);text-align:center;padding:2rem;font-size:0.65rem;letter-spacing:0.5px;">
+  <strong>GRANAT</strong> &mdash;
+  <span class="en">Vision Alignment Document</span>
+  <span class="ru">Документ выравнивания видения</span>
+  | March 16, 2026 | <span class="en">Internal &amp; Confidential</span><span class="ru">Внутренний и конфиденциальный</span>
+</footer>
+
+<script>
+// ═══ LANGUAGE TOGGLE ═══
+function setLang(lang) {
+  document.body.classList.toggle('lang-ru', lang === 'ru');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  localStorage.setItem('granat-lang', lang);
+}
+// restore
+(function(){
+  const saved = localStorage.getItem('granat-lang');
+  if (saved) setLang(saved);
+})();
+
+// ═══ TAB SWITCHING ═══
+const scrollPositions = {};
+let activeTab = 'vision';
+
+function switchTab(tabId) {
+  // save scroll
+  scrollPositions[activeTab] = window.scrollY;
+  // hide all
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  // show target
+  const target = document.getElementById('tab-' + tabId);
+  if (target) target.classList.add('active');
+  const btn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+  if (btn) {
+    btn.classList.add('active');
+    // scroll tab into view on mobile
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+  activeTab = tabId;
+  // restore scroll
+  window.scrollTo(0, scrollPositions[tabId] || 0);
+  // trigger reveals
+  requestAnimationFrame(observeReveals);
+}
+
+// ═══ SCROLL PROGRESS ═══
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', function() {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  if (h > 0) progressBar.style.width = (window.scrollY / h * 100) + '%';
+}, { passive: true });
+
+// ═══ REVEAL ON SCROLL ═══
+function observeReveals() {
+  const reveals = document.querySelectorAll('.tab-content.active .reveal:not(.visible)');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(function(el) { observer.observe(el); });
+}
+// init
+observeReveals();
+// also on load for first tab
+window.addEventListener('load', function() {
+  observeReveals();
+  // Wrap all data-tables in scroll containers for mobile
+  document.querySelectorAll('.data-table').forEach(function(t) {
+    if (!t.parentElement.classList.contains('table-wrap')) {
+      var wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+      t.parentNode.insertBefore(wrap, t);
+      wrap.appendChild(t);
+    }
+  });
+});
+</script>
+</body>
+</html>
