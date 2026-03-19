@@ -425,6 +425,12 @@ nav {
   <button class="tab-btn" data-tab="full" onclick="switchTab('full')">
     <span class="en">Full Document</span><span class="ru">Полный документ</span>
   </button>
+  <button class="tab-btn" data-tab="sound" onclick="switchTab('sound')">
+    <span class="en">Sound Architecture</span><span class="ru">Звуковая Архитектура</span>
+  </button>
+  <button class="tab-btn" data-tab="cr" onclick="switchTab('cr')">
+    <span class="en">CR Priorities</span><span class="ru">Приоритеты CR</span>
+  </button>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -2497,6 +2503,841 @@ nav {
     <span class="ru">"Ни одна из идей не осталась без должного фокуса."</span>
   </p>
   <p><strong>GRANAT</strong> — <span class="en">One Billion Voices. One Song.</span><span class="ru">Миллиард голосов. Одна песня.</span> | March 16, 2026 | Confidential</p>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 8: SOUND ARCHITECTURE
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-sound">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">SOUND ARCHITECTURE</span><span class="ru">ЗВУКОВАЯ АРХИТЕКТУРА</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">IL Meetings Summary</span>
+    <span class="ru">Встречи с Ильёй Лукашевым</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">March 17-18, 2026 | For: OA Olga, GMT, Alex Berez, Leo, Hector | Prepared by Cone Red (Dima Levin)</span>
+    <span class="ru">17-18 марта 2026 | Для: OA Ольга, Ярослав, Саша, Лео, Гектор | Подготовлено Cone Red (Дима Левин)</span>
+  </p>
+</div>
+
+<!-- What Happened -->
+<div class="callout teal reveal">
+  <h4>
+    <span class="en">What Happened</span>
+    <span class="ru">Что произошло</span>
+  </h4>
+  <p>
+    <span class="en">Two meetings with Ilia Lukashev (IL), external sound engineering consultant. <strong>Meeting 1</strong> (March 17, ~70 min) — introductory: IL met the team, provided high-level assessment. <strong>Meeting 2</strong> (March 18, ~133 min) — technical deep-dive: Illia P walked IL through pipeline architecture, received specific feedback. Both GMT and Hector participated.</span>
+    <span class="ru">Две встречи с Ильёй Лукашевым (ИЛ), внешним консультантом по звуковой инженерии. <strong>Встреча 1</strong> (17 марта, ~70 мин) — вводная: ИЛ познакомился с командой, дал общую оценку. <strong>Встреча 2</strong> (18 марта, ~133 мин) — техническое погружение: Илья П. провёл ИЛ по архитектуре пайплайна, получил конкретную обратную связь. Участвовали Ярослав и Гектор.</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- Key Takeaways -->
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">Key Takeaways</span><span class="ru">Ключевые выводы</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">7 Critical Insights</span>
+    <span class="ru">7 критических выводов</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <!-- Takeaway 1 -->
+  <div class="card teal">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(0,137,123,0.1);color:var(--teal);border:1px solid var(--teal-muted);">
+        <span class="en">IL Assessment</span><span class="ru">Оценка ИЛ</span>
+      </span>
+    </div>
+    <h3><span class="en">Pipeline Over-Engineered</span><span class="ru">Пайплайн переусложнён</span></h3>
+    <p>
+      <span class="en">Many processing steps lack clear justification and risk making sound worse, not better. IL's direct quote: "Each processing stage is a degradation, always." He challenged us to justify every step.</span>
+      <span class="ru">Многие шаги обработки не имеют чёткого обоснования и рискуют ухудшить звук, а не улучшить. Прямая цитата ИЛ: «Каждый этап обработки — это деградация, всегда.» Он потребовал обосновать каждый шаг.</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 2 -->
+  <div class="card teal">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(0,137,123,0.1);color:var(--teal);border:1px solid var(--teal-muted);">
+        <span class="en">IL Recommendation</span><span class="ru">Рекомендация ИЛ</span>
+      </span>
+    </div>
+    <h3><span class="en">Minimal Processing</span><span class="ru">Минимальная обработка</span></h3>
+    <p>
+      <span class="en">~65% alignment between voices (not perfect sync). No pitch correction for choir. No noise gate. Only basic cleanup: declicking, plosive removal, extreme frequency filtering. The choir effect comes from natural imperfection.</span>
+      <span class="ru">~65% выравнивание между голосами (не идеальная синхронизация). Без коррекции тона для хора. Без шумового гейта. Только базовая чистка: декликинг, удаление плозивов, фильтрация крайних частот. Хоровой эффект возникает из естественного несовершенства.</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 3 -->
+  <div class="card teal">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(0,137,123,0.1);color:var(--teal);border:1px solid var(--teal-muted);">
+        <span class="en">IL Recommendation</span><span class="ru">Рекомендация ИЛ</span>
+      </span>
+    </div>
+    <h3><span class="en">Spectral Alignment</span><span class="ru">Спектральное выравнивание</span></h3>
+    <p>
+      <span class="en">Spectral-based alignment (matching voices by frequency content) is correct, not transient-based. Recommended tools: Revoice (commercial), MPL Align Takes (open-source). This is the industry standard for choir work.</span>
+      <span class="ru">Спектральное выравнивание (сопоставление голосов по частотному содержанию) — верный метод, а не транзиентное. Рекомендованные инструменты: Revoice (коммерческий), MPL Align Takes (open-source). Это индустриальный стандарт для хоровой работы.</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 4 -->
+  <div class="card teal">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(0,137,123,0.1);color:var(--teal);border:1px solid var(--teal-muted);">
+        <span class="en">Hypothesis by IL</span><span class="ru">Гипотеза ИЛ</span>
+      </span>
+    </div>
+    <h3><span class="en">Manual Mixing Required</span><span class="ru">Необходим ручной микс</span></h3>
+    <p>
+      <span class="en">The "choir effect" cannot be achieved purely by automation — manual mixing and spatial positioning by a sound engineer is needed for the final product. Automation can prepare a good sketch; human expertise finalizes it.</span>
+      <span class="ru">«Хоровой эффект» невозможно достичь чисто автоматизацией — для финального продукта нужен ручной микс и пространственное позиционирование звукоинженером. Автоматизация может подготовить хороший набросок; человеческая экспертиза завершает.</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 5 -->
+  <div class="card crimson">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:var(--crimson-glow);color:var(--crimson);border:1px solid var(--border-crimson);">
+        <span class="en">GMT Directive</span><span class="ru">Директива Ярослава</span>
+      </span>
+    </div>
+    <h3><span class="en">Priority #1: Voice In, Tune, Place</span><span class="ru">Приоритет №1: Принять голос, настроить, вставить</span></h3>
+    <p>
+      <span class="en">Accept voice, tune it, place it in the mix. Pitch to nearest stable note, rhythm alignment, stereo placement, volume balance. Everything else is secondary. Deadline: 2-3 weeks (early April).</span>
+      <span class="ru">Принять голос, обработать, вставить в фонограмму. Питч к ближайшей устойчивой ноте, ритмическое выравнивание, стерео-размещение, баланс громкости. Всё остальное вторично. Дедлайн: 2-3 недели (начало апреля).</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 6 -->
+  <div class="card crimson">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:var(--crimson-glow);color:var(--crimson);border:1px solid var(--border-crimson);">
+        <span class="en">GMT Directive</span><span class="ru">Директива Ярослава</span>
+      </span>
+    </div>
+    <h3><span class="en">15-30s Processing Latency</span><span class="ru">15-30 сек задержка обработки</span></h3>
+    <p>
+      <span class="en">Processing must complete within 15-30 seconds after a 15-16 second recording. GMT explicitly rejected 5 minutes and wants to target 30 seconds. Maximum 2 minutes for demo.</span>
+      <span class="ru">Обработка должна завершиться за 15-30 секунд после 15-16-секундной записи. Ярослав категорически отверг 5 минут и хочет целевые 30 секунд. Максимум 2 минуты для демо.</span>
+    </p>
+  </div>
+
+  <!-- Takeaway 7 -->
+  <div class="card purple">
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(123,31,162,0.08);color:var(--purple);border:1px solid var(--purple-muted);">
+        <span class="en">Dima's Idea</span><span class="ru">Идея Димы</span>
+      </span>
+    </div>
+    <h3><span class="en">Voice Clustering: ~3,000 Archetypes</span><span class="ru">Кластеризация голосов: ~3 000 архетипов</span></h3>
+    <p>
+      <span class="en">GMT's experiment with 1 million physical voices confirmed they sound like approximately 3,000 voices. Architecture can be built around ~3,000-6,000 voice archetypes instead of storing billions of individual recordings. Dramatically simplifies infrastructure.</span>
+      <span class="ru">Эксперимент Ярослава с 1 миллионом физических голосов подтвердил, что они звучат как примерно 3 000 голосов. Архитектуру можно строить вокруг ~3 000-6 000 голосовых архетипов вместо хранения миллиардов записей. Драматически упрощает инфраструктуру.</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Key Quote -->
+<div class="quote-block reveal">
+  <span class="ru">«Принять голос, обработать его и вставить его в фонограмму. Как только мы пройдём вот это — камень преткновения.»</span>
+  <span class="en">"Accept the voice, process it, and insert it into the track. Once we pass this — the stumbling block."</span>
+  <div class="attribution">— GMT (Yaroslav/Moshe), March 17, 2026</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Decisions Made -->
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">Decisions</span><span class="ru">Решения</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">10 Key Decisions</span>
+    <span class="ru">10 ключевых решений</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>#</th><th>Decision</th><th>Who Decided</th><th>Status</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>#</th><th>Решение</th><th>Кто решил</th><th>Статус</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td>D1</td><td>Reduce post-processing to minimum — stop adding artificial effects</td><td>IL (endorsed by GMT, Hector)</td><td><span class="tag decided">AGREED</span></td></tr>
+      <tr><td>D2</td><td>Remove noise gate (destroys natural room sound that holds choir together)</td><td>IL</td><td><span class="tag decided">AGREED</span></td></tr>
+      <tr><td>D3</td><td>Use spectral alignment instead of transient-based</td><td>IL</td><td><span class="tag decided">AGREED</span></td></tr>
+      <tr><td>D4</td><td>Keep original voice recordings (not just mathematical models)</td><td>Team consensus</td><td><span class="tag decided">CONFIRMED</span></td></tr>
+      <tr><td>D5</td><td>Target 65% alignment between voices (not perfect sync)</td><td>IL</td><td><span class="tag decided">AGREED</span></td></tr>
+      <tr><td>D6</td><td>Priority #1: voice in, tune, place in mix — everything else waits</td><td>GMT</td><td><span class="tag proposed">DIRECTIVE</span></td></tr>
+      <tr><td>D7</td><td>Processing within 15-30 seconds (max 2 min for demo)</td><td>GMT</td><td><span class="tag proposed">DIRECTIVE</span></td></tr>
+      <tr><td>D8</td><td>Test moving alignment steps earlier in the pipeline</td><td>Hector (endorsed by team)</td><td><span class="tag proposed">TO TEST</span></td></tr>
+      <tr><td>D9</td><td>Processing must adapt to each voice type (child vs. adult, iPhone vs. Android)</td><td>IL</td><td><span class="tag decided">AGREED</span></td></tr>
+      <tr><td>D10</td><td>Explore Dolby Atmos for premium live experience</td><td>IL</td><td><span class="tag aspirational">FUTURE</span></td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td>D1</td><td>Сократить пост-обработку до минимума — прекратить добавление искусственных эффектов</td><td>ИЛ (поддержано Ярославом, Гектором)</td><td><span class="tag decided">СОГЛАСОВАНО</span></td></tr>
+      <tr><td>D2</td><td>Убрать шумовой гейт (разрушает естественное звучание комнаты, скрепляющее хор)</td><td>ИЛ</td><td><span class="tag decided">СОГЛАСОВАНО</span></td></tr>
+      <tr><td>D3</td><td>Использовать спектральное выравнивание вместо транзиентного</td><td>ИЛ</td><td><span class="tag decided">СОГЛАСОВАНО</span></td></tr>
+      <tr><td>D4</td><td>Хранить оригинальные записи голосов (не только математические модели)</td><td>Консенсус команды</td><td><span class="tag decided">ПОДТВЕРЖДЕНО</span></td></tr>
+      <tr><td>D5</td><td>Целевое выравнивание 65% между голосами (не идеальная синхронизация)</td><td>ИЛ</td><td><span class="tag decided">СОГЛАСОВАНО</span></td></tr>
+      <tr><td>D6</td><td>Приоритет №1: принять голос, настроить, вставить в микс — всё остальное ждёт</td><td>Ярослав</td><td><span class="tag proposed">ДИРЕКТИВА</span></td></tr>
+      <tr><td>D7</td><td>Обработка за 15-30 секунд (макс. 2 мин для демо)</td><td>Ярослав</td><td><span class="tag proposed">ДИРЕКТИВА</span></td></tr>
+      <tr><td>D8</td><td>Тестировать перенос шагов выравнивания раньше в пайплайне</td><td>Гектор (поддержано командой)</td><td><span class="tag proposed">ТЕСТИРОВАТЬ</span></td></tr>
+      <tr><td>D9</td><td>Обработка должна адаптироваться к типу голоса (ребёнок vs. взрослый, iPhone vs. Android)</td><td>ИЛ</td><td><span class="tag decided">СОГЛАСОВАНО</span></td></tr>
+      <tr><td>D10</td><td>Исследовать Dolby Atmos для премиального живого опыта</td><td>ИЛ</td><td><span class="tag aspirational">БУДУЩЕЕ</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- What Cone Red Delivers Next -->
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">Deliverables</span><span class="ru">Результаты</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">What Cone Red Delivers Next</span>
+    <span class="ru">Что Cone Red делает дальше</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <h3 style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--teal);margin-bottom:1rem;">
+    <span class="en">Immediate — Early April</span>
+    <span class="ru">Немедленно — начало апреля</span>
+  </h3>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card teal">
+    <h3><span class="en">Pitch-Snapping Algorithm</span><span class="ru">Алгоритм привязки к ноте</span></h3>
+    <p>
+      <span class="en">When someone sings a note, the system finds the nearest correct note in the song and adjusts the voice to match. GMT's #1 requirement and the foundation everything else depends on.</span>
+      <span class="ru">Когда кто-то поёт ноту, система находит ближайшую правильную ноту в песне и корректирует голос. Требование №1 Ярослава и фундамент, от которого зависит всё остальное.</span>
+    </p>
+    <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);">
+      <span class="en">Owner: Dima + Illia P</span><span class="ru">Владелец: Дима + Илья П.</span>
+    </p>
+  </div>
+
+  <div class="card teal">
+    <h3><span class="en">Spectral Alignment for Melody</span><span class="ru">Спектральное выравнивание для мелодии</span></h3>
+    <p>
+      <span class="en">Replacing word-based alignment (only works with lyrics) with spectral alignment that works for any singing, including wordless melodies like "O."</span>
+      <span class="ru">Замена выравнивания по словам (работает только с текстом) на спектральное выравнивание, работающее для любого пения, включая бессловесные мелодии вроде «О».</span>
+    </p>
+    <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);">
+      <span class="en">Owner: Illia P</span><span class="ru">Владелец: Илья П.</span>
+    </p>
+  </div>
+
+  <div class="card teal">
+    <h3><span class="en">Simplified Pipeline</span><span class="ru">Упрощённый пайплайн</span></h3>
+    <p>
+      <span class="en">Removing unnecessary steps IL identified as degrading quality (noise gate, artificial panning/detuning/timing). Less processing = better sound.</span>
+      <span class="ru">Удаление ненужных шагов, которые ИЛ определил как ухудшающие качество (шумовой гейт, искусственное панорамирование/расстройка/тайминг). Меньше обработки = лучше звук.</span>
+    </p>
+    <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);">
+      <span class="en">Owner: Illia P</span><span class="ru">Владелец: Илья П.</span>
+    </p>
+  </div>
+
+  <div class="card teal">
+    <h3><span class="en">Recording Quality Gate</span><span class="ru">Контроль качества записи</span></h3>
+    <p>
+      <span class="en">Automatically detect and reject recordings with distortion or clipping. These cannot be fixed after recording — accept clean recordings only.</span>
+      <span class="ru">Автоматическое обнаружение и отклонение записей с искажениями или клиппингом. Их нельзя исправить после записи — принимать только чистые записи.</span>
+    </p>
+    <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);">
+      <span class="en">Owner: Illia P / Nijat</span><span class="ru">Владелец: Илья П. / Ниджат</span>
+    </p>
+  </div>
+</div>
+
+<div class="reveal">
+  <h3 style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--purple);margin:2rem 0 1rem;">
+    <span class="en">Next Phase</span>
+    <span class="ru">Следующая фаза</span>
+  </h3>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card purple">
+    <h3><span class="en">Adaptive Processing</span><span class="ru">Адаптивная обработка</span></h3>
+    <p>
+      <span class="en">Smart system that analyzes each voice first, then decides how to process it. Different approach for children vs. adults, iPhone vs. Android microphones.</span>
+      <span class="ru">Умная система, которая сначала анализирует каждый голос, затем решает, как его обработать. Разный подход для детей vs. взрослых, iPhone vs. Android микрофонов.</span>
+    </p>
+  </div>
+
+  <div class="card purple">
+    <h3><span class="en">Recording Guidance UX</span><span class="ru">UX подсказок при записи</span></h3>
+    <p>
+      <span class="en">Visual metronome and pitch indicator during recording to help users sing more accurately. IL described this as a "micro-musical Duolingo."</span>
+      <span class="ru">Визуальный метроном и индикатор тона во время записи, помогающий пользователям петь точнее. ИЛ описал это как «микро-музыкальный Duolingo».</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Timeline -->
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">Timeline</span><span class="ru">Хронология</span>
+  </div>
+</div>
+
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>When</th><th>What</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>Когда</th><th>Что</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td><strong>Now — early April</strong></td><td>Core pipeline: pitch-snap, spectral alignment, simplified processing</td></tr>
+      <tr><td><strong>Before next IL call</strong></td><td>Prepare audio samples (input + output at each stage) for IL to evaluate</td></tr>
+      <tr><td><strong>Next IL call</strong></td><td>To be scheduled at 10 AM LA time (7 PM Barcelona, 8 PM Cyprus)</td></tr>
+      <tr><td><strong>GMT studio period</strong></td><td>March — April 2026 (1.5 months)</td></tr>
+      <tr><td><strong>End April 2026</strong></td><td>Voice aggregation R&D target</td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td><strong>Сейчас — начало апреля</strong></td><td>Базовый пайплайн: привязка к ноте, спектральное выравнивание, упрощённая обработка</td></tr>
+      <tr><td><strong>До следующего звонка с ИЛ</strong></td><td>Подготовить аудио-примеры (вход + выход на каждом этапе) для оценки ИЛ</td></tr>
+      <tr><td><strong>Следующий звонок с ИЛ</strong></td><td>Запланировать на 10 утра LA (19:00 Барселона, 20:00 Кипр)</td></tr>
+      <tr><td><strong>Период Ярослава в студии</strong></td><td>Март — апрель 2026 (1,5 месяца)</td></tr>
+      <tr><td><strong>Конец апреля 2026</strong></td><td>Целевой срок R&D голосовой агрегации</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- IL Engagement -->
+<div class="callout gold reveal">
+  <h4>
+    <span class="en">IL's Engagement</span>
+    <span class="ru">Вовлечённость ИЛ</span>
+  </h4>
+  <p>
+    <span class="en">IL is genuinely interested in the project. He values substance over slides. For future meetings: send materials and audio samples in advance — he thinks in sound, not in flowcharts.</span>
+    <span class="ru">ИЛ искренне заинтересован в проекте. Он ценит содержание больше слайдов. Для будущих встреч: отправлять материалы и аудио-примеры заранее — он мыслит звуком, а не блок-схемами.</span>
+  </p>
+</div>
+
+<div class="quote-block reveal">
+  <span class="ru">«Мне очень эта идея резонирует.»</span>
+  <span class="en">"This idea resonates with me deeply."</span>
+  <div class="attribution">— Ilia Lukashev (IL)</div>
+</div>
+
+<div style="text-align:center;padding:2rem 0;color:var(--text-muted);font-size:0.8rem;">
+  <p><strong>GRANAT</strong> — <span class="en">Sound Architecture | IL Meetings Summary</span><span class="ru">Звуковая Архитектура | Сводка встреч с ИЛ</span> | March 19, 2026</p>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 9: CR PRIORITIES
+     ═══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-cr">
+<div class="container">
+
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">CR PRIORITIES</span><span class="ru">ПРИОРИТЕТЫ CR</span>
+  </div>
+  <h1 class="section-title">
+    <span class="en">Cone Red Roadmap</span>
+    <span class="ru">Дорожная Карта Cone Red</span>
+  </h1>
+  <p class="section-subtitle">
+    <span class="en">March 19 — April 19, 2026 | For: Cone Red (Dima, Illia P, Nijat, Mikhail, Tahir)</span>
+    <span class="ru">19 марта — 19 апреля 2026 | Для: Cone Red (Дима, Илья П., Ниджат, Михаил, Тахир)</span>
+  </p>
+</div>
+
+<!-- The Concept Card - HERO MOMENT -->
+<div class="callout crimson reveal" style="padding:2rem 2.5rem;border:2px solid var(--border-crimson);background:linear-gradient(135deg, rgba(155,27,48,0.06), rgba(212,175,55,0.04));">
+  <h4 style="font-size:1rem;letter-spacing:2px;margin-bottom:0.8rem;">
+    <span class="en">THE CONCEPT</span><span class="ru">КОНЦЕПЦИЯ</span>
+  </h4>
+  <p style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--crimson);font-weight:700;line-height:1.5;margin-bottom:1rem;">
+    <span class="en">"Proto-Instagram for Singing"</span>
+    <span class="ru">«Прото-Инстаграм для пения»</span>
+  </p>
+  <p style="font-size:0.92rem;color:var(--text-primary);line-height:1.7;">
+    <span class="en">Why did people love Instagram and take photos on iPhone? Because of <strong>FILTERS</strong>. They made every photo look pretty. We have to build the same for singing — make every voice sound beautiful from any device, with any voice. <strong>First pretty, then align as choir.</strong></span>
+    <span class="ru">Почему люди полюбили Инстаграм и фотографируют на Айфон? Из-за <strong>ФИЛЬТРОВ</strong>. Они делали каждое фото красивым. Мы должны построить то же самое для пения — сделать каждый голос красивым с любого устройства, с любым голосом. <strong>Сначала красиво, потом выравниваем в хор.</strong></span>
+  </p>
+  <p style="margin-top:0.8rem;font-size:0.75rem;color:var(--text-muted);font-style:italic;">
+    <span class="en">— Dima Levin, insight from IL meetings analysis</span>
+    <span class="ru">— Дима Левин, вывод из анализа встреч с ИЛ</span>
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3-Phase Roadmap -->
+<div class="reveal">
+  <div class="section-label">
+    <span class="en">Roadmap</span><span class="ru">Дорожная карта</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">3-Phase Delivery</span>
+    <span class="ru">3-фазная реализация</span>
+  </h2>
+</div>
+
+<div class="grid-3 reveal">
+  <!-- Phase 1 -->
+  <div class="pillar-card tech">
+    <div class="pillar-num">1</div>
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag decided">
+        <span class="en">ACTIVE</span><span class="ru">АКТИВНА</span>
+      </span>
+    </div>
+    <h3><span class="en">Voice Beautification</span><span class="ru">Бьютификация голоса</span></h3>
+    <p style="font-size:0.75rem;color:var(--teal);font-weight:600;margin-bottom:0.6rem;">
+      <span class="en">Now → April 19</span><span class="ru">Сейчас → 19 апреля</span>
+    </p>
+    <p>
+      <span class="en">The "Instagram filter for singing." Make every voice sound good before alignment.</span>
+      <span class="ru">«Инстаграм-фильтр для пения.» Сделать каждый голос красивым до выравнивания.</span>
+    </p>
+    <ul style="padding-left:1.2rem;margin-top:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+      <li class="en">Pitch-snapping to nearest stable note</li>
+      <li class="en">Spectral alignment for "O" melody</li>
+      <li class="en">Simplified pipeline (8 steps → 5)</li>
+      <li class="en">Recording quality gate</li>
+      <li class="en">Target: &lt;30 sec processing</li>
+      <li class="ru">Привязка к ближайшей устойчивой ноте</li>
+      <li class="ru">Спектральное выравнивание для мелодии «О»</li>
+      <li class="ru">Упрощённый пайплайн (8 шагов → 5)</li>
+      <li class="ru">Контроль качества записи</li>
+      <li class="ru">Цель: &lt;30 сек обработка</li>
+    </ul>
+    <p style="margin-top:0.6rem;font-size:0.72rem;color:var(--text-muted);">
+      <span class="en">Tasks: T1, T2, T3, T4</span><span class="ru">Задачи: T1, T2, T3, T4</span>
+    </p>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="pillar-card traffic">
+    <div class="pillar-num">2</div>
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag aspirational">
+        <span class="en">NEXT</span><span class="ru">СЛЕДУЮЩАЯ</span>
+      </span>
+    </div>
+    <h3><span class="en">Choir Assembly</span><span class="ru">Сборка хора</span></h3>
+    <p style="font-size:0.75rem;color:var(--purple);font-weight:600;margin-bottom:0.6rem;">
+      <span class="en">After April 19</span><span class="ru">После 19 апреля</span>
+    </p>
+    <p>
+      <span class="en">Align beautified voices into choir. Automation prepares sketch, human finalizes.</span>
+      <span class="ru">Выравнивание бьютифицированных голосов в хор. Автоматизация готовит набросок, человек финализирует.</span>
+    </p>
+    <ul style="padding-left:1.2rem;margin-top:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+      <li class="en">Adaptive mastering per voice type</li>
+      <li class="en">Manual mixing integration (IL's role)</li>
+      <li class="en">~65% alignment target</li>
+      <li class="en">Spectral alignment tools evaluation</li>
+      <li class="ru">Адаптивный мастеринг по типу голоса</li>
+      <li class="ru">Интеграция ручного микса (роль ИЛ)</li>
+      <li class="ru">Целевое выравнивание ~65%</li>
+      <li class="ru">Оценка инструментов спектрального выравнивания</li>
+    </ul>
+    <p style="margin-top:0.6rem;font-size:0.72rem;color:var(--text-muted);">
+      <span class="en">Tasks: T5, T6, T7</span><span class="ru">Задачи: T5, T6, T7</span>
+    </p>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="pillar-card economy">
+    <div class="pillar-num">3</div>
+    <div style="margin-bottom:0.6rem;">
+      <span class="tag" style="background:rgba(184,134,11,0.08);color:var(--gold);border:1px solid var(--gold-muted);">
+        <span class="en">FUTURE</span><span class="ru">БУДУЩЕЕ</span>
+      </span>
+    </div>
+    <h3><span class="en">Mathematical Architecture</span><span class="ru">Математическая архитектура</span></h3>
+    <p style="font-size:0.75rem;color:var(--gold);font-weight:600;margin-bottom:0.6rem;">
+      <span class="en">After Choir Works</span><span class="ru">После хора</span>
+    </p>
+    <p>
+      <span class="en">Alex Berez's 3-pillar parametrization. Full infrastructure for scale.</span>
+      <span class="ru">3-столповая параметризация Саши Березовского. Полная инфраструктура для масштабирования.</span>
+    </p>
+    <ul style="padding-left:1.2rem;margin-top:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+      <li class="en">3,000 voice archetypes validation</li>
+      <li class="en">NFT/blockchain integration</li>
+      <li class="en">Dolby Atmos spatial audio</li>
+      <li class="en">Full infrastructure scaling</li>
+      <li class="ru">Валидация 3 000 голосовых архетипов</li>
+      <li class="ru">Интеграция NFT/блокчейн</li>
+      <li class="ru">Пространственное аудио Dolby Atmos</li>
+      <li class="ru">Полное масштабирование инфраструктуры</li>
+    </ul>
+    <p style="margin-top:0.6rem;font-size:0.72rem;color:var(--text-muted);">
+      <span class="en">Tasks: T8, T9, T10</span><span class="ru">Задачи: T8, T9, T10</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Pipeline Before/After -->
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">Pipeline Changes</span><span class="ru">Изменения пайплайна</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Before &amp; After</span>
+    <span class="ru">До и после</span>
+  </h2>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="callout crimson">
+    <h4>
+      <span class="en">Current Pipeline (8 Steps)</span>
+      <span class="ru">Текущий пайплайн (8 шагов)</span>
+    </h4>
+    <ol style="padding-left:1.2rem;margin-top:0.5rem;">
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Onset alignment</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Global tempo normalization</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Whisper ASR</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Median word timeline</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Per-word time stretch</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Cross-correlation</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Post-processing (noise gate, pan, detune, timing)</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Mastering chain</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Onset-выравнивание</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Глобальная нормализация темпа</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Whisper ASR</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Медианный таймлайн слов</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Растяжение по словам</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Кросс-корреляция</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:line-through;opacity:0.6;">Пост-обработка (гейт, панорама, расстройка, тайминг)</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Цепь мастеринга</li>
+    </ol>
+  </div>
+
+  <div class="callout teal">
+    <h4>
+      <span class="en">Proposed Pipeline (5 Steps)</span>
+      <span class="ru">Предлагаемый пайплайн (5 шагов)</span>
+    </h4>
+    <ol style="padding-left:1.2rem;margin-top:0.5rem;">
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Onset alignment</li>
+      <li class="en" style="font-size:0.82rem;color:var(--text-secondary);">Global tempo normalization</li>
+      <li class="en" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Spectral alignment (replaces steps 3-5)</li>
+      <li class="en" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Minimal cleanup (declicking, plosives, extreme EQ only)</li>
+      <li class="en" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Adaptive mastering (source-aware)</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Onset-выравнивание</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--text-secondary);">Глобальная нормализация темпа</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Спектральное выравнивание (заменяет шаги 3-5)</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Минимальная чистка (декликинг, плозивы, крайний EQ)</li>
+      <li class="ru" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Адаптивный мастеринг (с учётом источника)</li>
+    </ol>
+  </div>
+</div>
+
+<!-- What to Remove table -->
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>Step Removed</th><th>Why</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>Удалённый шаг</th><th>Причина</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td>Noise gate</td><td>Destroys spatial character. IL: "it loses the spatial part almost completely"</td></tr>
+      <tr><td>Artificial pan/detune/timing</td><td>Natural variation from different singers already provides these. Adding more makes it worse.</td></tr>
+      <tr><td>Whisper ASR</td><td>Only works for lyrics. Fails completely on "O" melody.</td></tr>
+      <tr><td>Median word timeline</td><td>Compensated by spectral alignment.</td></tr>
+      <tr><td>Per-word time stretch</td><td>Subsumed by spectral alignment method.</td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td>Шумовой гейт</td><td>Разрушает пространственный характер. ИЛ: «пространственная часть теряется почти полностью»</td></tr>
+      <tr><td>Искусственная панорама/расстройка/тайминг</td><td>Естественная вариация от разных певцов уже обеспечивает это. Добавление делает хуже.</td></tr>
+      <tr><td>Whisper ASR</td><td>Работает только для текста. Полностью провал на мелодии «О».</td></tr>
+      <tr><td>Медианный таймлайн слов</td><td>Компенсируется спектральным выравниванием.</td></tr>
+      <tr><td>Растяжение по словам</td><td>Поглощается методом спектрального выравнивания.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- Priority 1 Tasks -->
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">Critical Path</span><span class="ru">Критический путь</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Priority 1 Tasks</span>
+    <span class="ru">Задачи приоритета 1</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>#</th><th>Task</th><th>Owner</th><th>Why</th><th>Status</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>#</th><th>Задача</th><th>Владелец</th><th>Зачем</th><th>Статус</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td>T1</td><td>Build pitch-snapping algorithm (nearest stable note in key)</td><td>Dima + Illia P</td><td>GMT's #1 requirement. Without this, no demo.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T2</td><td>Replace Whisper alignment with spectral alignment for non-lyric content</td><td>Illia P</td><td>Current pipeline fails on "O" melody.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T3</td><td>Strip Pipeline C post-processing to minimum</td><td>Illia P</td><td>IL's strongest recommendation. Current processing degrades quality.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T4</td><td>Implement quality gate at recording stage</td><td>Illia P / Nijat</td><td>Garbage in = garbage out. Distortion cannot be fixed.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td>T1</td><td>Построить алгоритм привязки к ноте (ближайшая устойчивая нота в тональности)</td><td>Дима + Илья П.</td><td>Требование №1 Ярослава. Без этого нет демо.</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T2</td><td>Заменить Whisper-выравнивание на спектральное для контента без слов</td><td>Илья П.</td><td>Текущий пайплайн не работает на мелодии «О».</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T3</td><td>Сократить пост-обработку Pipeline C до минимума</td><td>Илья П.</td><td>Самая сильная рекомендация ИЛ. Текущая обработка ухудшает качество.</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T4</td><td>Внедрить контроль качества на этапе записи</td><td>Илья П. / Ниджат</td><td>Мусор на входе = мусор на выходе. Искажения нельзя исправить.</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- Priority 2 Tasks -->
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">High Value</span><span class="ru">Высокая ценность</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Priority 2 Tasks</span>
+    <span class="ru">Задачи приоритета 2</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>#</th><th>Task</th><th>Owner</th><th>Why</th><th>Status</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>#</th><th>Задача</th><th>Владелец</th><th>Зачем</th><th>Статус</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td>T5</td><td>Build adaptive mastering router (analyze source, select chain)</td><td>Dima + Illia P</td><td>One-size-fits-all mastering fails for diverse inputs.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T6</td><td>Evaluate spectral alignment tools (Revoice, MPL Align Takes)</td><td>Illia P</td><td>These tools solve the alignment problem. Learn from them.</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T7</td><td>Prototype recording guidance UX (visual metronome, pitch indicator)</td><td>Hector + UX</td><td>Help user minimize error at recording time. "Micro-musical Duolingo."</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+      <tr><td>T8</td><td>Validate 3,000-archetype hypothesis with existing recordings</td><td>Illia P</td><td>If confirmed, simplifies infrastructure from O(n) to O(1).</td><td><span class="tag proposed">NOT STARTED</span></td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td>T5</td><td>Построить адаптивный маршрутизатор мастеринга (анализ источника, выбор цепи)</td><td>Дима + Илья П.</td><td>Единый мастеринг не работает для разных входов.</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T6</td><td>Оценить инструменты спектрального выравнивания (Revoice, MPL Align Takes)</td><td>Илья П.</td><td>Эти инструменты решают проблему выравнивания. Учиться у них.</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T7</td><td>Прототип UX подсказок при записи (визуальный метроном, индикатор тона)</td><td>Гектор + UX</td><td>Помочь пользователю минимизировать ошибки при записи. «Микро-музыкальный Duolingo.»</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+      <tr><td>T8</td><td>Валидация гипотезы 3 000 архетипов на существующих записях</td><td>Илья П.</td><td>Если подтвердится, упрощает инфраструктуру с O(n) до O(1).</td><td><span class="tag proposed">НЕ НАЧАТА</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- Hypotheses to Verify -->
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">Hypotheses</span><span class="ru">Гипотезы</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Hypotheses to Verify</span>
+    <span class="ru">Гипотезы для проверки</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <table class="data-table">
+    <thead class="en">
+      <tr><th>#</th><th>Hypothesis</th><th>Test Method</th><th>Assigned To</th></tr>
+    </thead>
+    <thead class="ru">
+      <tr><th>#</th><th>Гипотеза</th><th>Метод проверки</th><th>Ответственный</th></tr>
+    </thead>
+    <tbody class="en">
+      <tr><td>H1</td><td>Removing noise gate improves choir cohesion</td><td>A/B test: current vs. no-noise-gate with 5+ voices</td><td>Illia P</td></tr>
+      <tr><td>H2</td><td>~65% alignment sounds better than ~95%</td><td>Test with alignment slider at 65%, 80%, 95%</td><td>Illia P</td></tr>
+      <tr><td>H3</td><td>3,000 voice archetypes cover perceptual voice space</td><td>Cluster existing recordings, measure inter-cluster distance</td><td>Illia P</td></tr>
+      <tr><td>H4</td><td>Spectral alignment works better than Whisper ASR for "O"</td><td>Implement spectral, compare cross-correlation scores</td><td>Illia P</td></tr>
+      <tr><td>H5</td><td>Adaptive mastering improves output vs. static chain</td><td>Route different voice types through different chains</td><td>Dima + Illia P</td></tr>
+      <tr><td>H6</td><td>Visual recording guidance reduces pitch/rhythm errors</td><td>A/B test with/without visual metronome + pitch indicator</td><td>Hector + UX</td></tr>
+      <tr><td>H7</td><td>Processing can be done in &lt;30 seconds for 15s recording</td><td>Profile pipeline, identify bottlenecks, optimize</td><td>Dima</td></tr>
+    </tbody>
+    <tbody class="ru">
+      <tr><td>H1</td><td>Удаление шумового гейта улучшает сплочённость хора</td><td>A/B тест: текущий vs. без гейта с 5+ голосами</td><td>Илья П.</td></tr>
+      <tr><td>H2</td><td>~65% выравнивание звучит лучше ~95%</td><td>Тест со слайдером выравнивания 65%, 80%, 95%</td><td>Илья П.</td></tr>
+      <tr><td>H3</td><td>3 000 голосовых архетипов покрывают пространство голосов</td><td>Кластеризация записей, измерение межкластерных расстояний</td><td>Илья П.</td></tr>
+      <tr><td>H4</td><td>Спектральное выравнивание лучше Whisper ASR для «О»</td><td>Реализовать спектральное, сравнить кросс-корреляцию</td><td>Илья П.</td></tr>
+      <tr><td>H5</td><td>Адаптивный мастеринг улучшает выход vs. статическая цепь</td><td>Маршрутизация разных типов голоса через разные цепи</td><td>Дима + Илья П.</td></tr>
+      <tr><td>H6</td><td>Визуальные подсказки снижают ошибки тона/ритма</td><td>A/B тест с/без визуального метронома + индикатора тона</td><td>Гектор + UX</td></tr>
+      <tr><td>H7</td><td>Обработка за &lt;30 секунд для 15-секундной записи</td><td>Профилирование пайплайна, поиск узких мест, оптимизация</td><td>Дима</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- Key Risks -->
+<div class="reveal">
+  <div class="section-label red">
+    <span class="en">Key Risks</span><span class="ru">Ключевые риски</span>
+  </div>
+</div>
+
+<div class="grid-2 reveal">
+  <div class="card crimson">
+    <h3><span class="en">R1: IL Availability</span><span class="ru">R1: Доступность ИЛ</span></h3>
+    <p>
+      <span class="en"><strong>High likelihood, High impact.</strong> Studio schedule and LA timezone constrain call windows. Mitigation: async communication via group chat, focused questions, audio examples not flowcharts.</span>
+      <span class="ru"><strong>Высокая вероятность, Высокое влияние.</strong> Студийный график и часовой пояс LA ограничивают окна звонков. Митигация: асинхронная коммуникация через групповой чат, конкретные вопросы, аудио-примеры, не блок-схемы.</span>
+    </p>
+  </div>
+
+  <div class="card crimson">
+    <h3><span class="en">R2: Pitch-Correction Complexity</span><span class="ru">R2: Сложность коррекции тона</span></h3>
+    <p>
+      <span class="en"><strong>Medium likelihood, Critical impact.</strong> GMT identified this as the main "stone to move." Start with simple nearest-note snapping, iterate. Consult IL for edge cases.</span>
+      <span class="ru"><strong>Средняя вероятность, Критическое влияние.</strong> Ярослав определил это как главный «камень преткновения». Начать с простой привязки к ноте, итерировать. Консультироваться с ИЛ по крайним случаям.</span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><span class="en">R3: Over-Stripping Processing</span><span class="ru">R3: Чрезмерное сокращение обработки</span></h3>
+    <p>
+      <span class="en"><strong>Medium likelihood, Medium impact.</strong> IL said "minimal," not "none." Keep basic cleanup. A/B test every removal decision.</span>
+      <span class="ru"><strong>Средняя вероятность, Среднее влияние.</strong> ИЛ сказал «минимально», а не «ничего». Сохранить базовую чистку. A/B тестировать каждое удаление.</span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><span class="en">R4: 2-3 Week Deadline Risk</span><span class="ru">R4: Риск дедлайна 2-3 недели</span></h3>
+    <p>
+      <span class="en"><strong>Medium likelihood, High impact.</strong> Focus exclusively on T1-T4. No infrastructure work. No Dolby Atmos. Demo-quality only.</span>
+      <span class="ru"><strong>Средняя вероятность, Высокое влияние.</strong> Фокус исключительно на T1-T4. Никакой инфраструктурной работы. Никакого Dolby Atmos. Только демо-качество.</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Definition of Success -->
+<div class="reveal">
+  <div class="section-label gold">
+    <span class="en">Success Criteria</span><span class="ru">Критерии успеха</span>
+  </div>
+  <h2 class="section-title">
+    <span class="en">Definition of Success</span>
+    <span class="ru">Определение успеха</span>
+  </h2>
+</div>
+
+<div class="reveal">
+  <div class="callout teal">
+    <h4>
+      <span class="en">IL's Perspective</span>
+      <span class="ru">Перспектива ИЛ</span>
+    </h4>
+    <p>
+      <span class="en">Voice recordings aligned and mixed to sound like a real choir, not "a bunch of recordings played simultaneously." Minimal processing preserves natural spatial character. Pipeline is simple, justifiable, not over-engineered.</span>
+      <span class="ru">Голосовые записи выровнены и смикшированы так, чтобы звучать как настоящий хор, а не «куча записей, играющих одновременно». Минимальная обработка сохраняет естественный пространственный характер. Пайплайн простой, обоснованный, не переусложнённый.</span>
+    </p>
+  </div>
+
+  <div class="callout crimson">
+    <h4>
+      <span class="en">GMT's Perspective</span>
+      <span class="ru">Перспектива Ярослава</span>
+    </h4>
+    <p>
+      <span class="en">Person records voice on phone, within 30 seconds hears themselves as part of the song. Result doesn't sound fake, robotic, or out of tune. Demonstrable to investors and partners within 2-3 weeks.</span>
+      <span class="ru">Человек записывает голос на телефон, в течение 30 секунд слышит себя как часть песни. Результат не звучит фальшиво, роботизированно или нестройно. Демонстрируемо инвесторам и партнёрам в течение 2-3 недель.</span>
+    </p>
+  </div>
+
+  <div class="callout purple">
+    <h4>
+      <span class="en">Cone Red's Perspective</span>
+      <span class="ru">Перспектива Cone Red</span>
+    </h4>
+    <p>
+      <span class="en">Simplified pipeline that produces better output with fewer steps. Clear rules for adaptive processing extracted from IL's expertise. Validated architecture based on ~3,000 voice archetypes. Processing within latency targets. A working demo GMT can show to stakeholders.</span>
+      <span class="ru">Упрощённый пайплайн, дающий лучший результат с меньшим количеством шагов. Чёткие правила адаптивной обработки, извлечённые из экспертизы ИЛ. Валидированная архитектура на ~3 000 голосовых архетипах. Обработка в рамках целевой задержки. Рабочее демо, которое Ярослав может показать стейкхолдерам.</span>
+    </p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Open Questions -->
+<div class="reveal">
+  <div class="section-label purple">
+    <span class="en">Open Questions</span><span class="ru">Открытые вопросы</span>
+  </div>
+</div>
+
+<div class="reveal">
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <span class="en"><strong>[CR Team + Hector + IL]</strong> What are the exact "rules" in IL's head for adaptive processing? We need to extract the decision tree: if child voice, these filters; if bass, these filters; if Android mic, these corrections. Requires a dedicated session with IL.</span>
+      <span class="ru"><strong>[Команда CR + Гектор + ИЛ]</strong> Какие точные «правила» в голове ИЛ для адаптивной обработки? Нужно извлечь дерево решений: если детский голос — эти фильтры; если бас — эти; если Android-микрофон — эти коррекции. Требуется отдельная сессия с ИЛ.</span>
+    </div>
+  </div>
+
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <span class="en"><strong>[CR Team]</strong> How to achieve &lt;30s processing latency? Current pipeline has many sequential steps. What can be parallelized? What can be skipped for real-time preview vs. queued for high-quality render?</span>
+      <span class="ru"><strong>[Команда CR]</strong> Как достичь &lt;30 сек задержки обработки? Текущий пайплайн имеет много последовательных шагов. Что можно распараллелить? Что можно пропустить для превью в реальном времени vs. очередь для рендера высокого качества?</span>
+    </div>
+  </div>
+
+  <div class="action-item">
+    <div class="action-num">3</div>
+    <div class="action-body">
+      <span class="en"><strong>[CR Team]</strong> Is the mel spectrogram approach for synthesis the right path? IL didn't review this specifically. He challenged the entire resynthesis concept — needs follow-up.</span>
+      <span class="ru"><strong>[Команда CR]</strong> Правильный ли путь — подход мел-спектрограммы для синтеза? ИЛ не рассматривал это конкретно. Он поставил под сомнение всю концепцию ресинтеза — нужно продолжение.</span>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:2rem 0;color:var(--text-muted);font-size:0.8rem;">
+  <p><strong>GRANAT</strong> — <span class="en">Cone Red Priorities</span><span class="ru">Приоритеты Cone Red</span> | March 19, 2026 | <span class="en">Internal</span><span class="ru">Внутренний</span></p>
 </div>
 
 </div>
