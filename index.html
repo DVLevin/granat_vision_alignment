@@ -401,9 +401,51 @@ nav {
 /* REVEAL ANIMATION */
 .reveal { opacity:0; transform:translateY(16px); transition:opacity 0.6s ease-out, transform 0.6s ease-out; }
 .reveal.visible { opacity:1; transform:translateY(0); }
+
+/* PASSWORD GATE */
+#pw-gate {
+  position:fixed; inset:0; z-index:10000;
+  background:linear-gradient(180deg, #FFFDF8 0%, #F5F3EE 100%);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  font-family:'Inter',sans-serif;
+}
+#pw-gate.hidden { display:none; }
+#pw-gate .pw-brand {
+  font-family:'Inter',sans-serif; font-weight:800; font-size:1.2rem;
+  color:var(--text-bright); letter-spacing:3px; margin-bottom:0.3rem;
+}
+#pw-gate .pw-brand em { font-style:normal; color:var(--crimson); }
+#pw-gate .pw-subtitle {
+  font-family:'Playfair Display',serif; font-size:0.85rem; font-style:italic;
+  color:var(--text-muted); margin-bottom:2rem;
+}
+#pw-gate input {
+  width:240px; padding:0.65rem 1rem; border:1px solid var(--border-medium);
+  border-radius:8px; font-family:'Inter',sans-serif; font-size:0.85rem;
+  text-align:center; outline:none; background:var(--bg-elevated);
+  transition:border-color 0.2s;
+}
+#pw-gate input:focus { border-color:var(--crimson); }
+#pw-gate input.error { border-color:#E57373; animation:shake 0.3s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+#pw-gate .pw-hint {
+  font-size:0.6rem; color:var(--text-muted); margin-top:0.6rem;
+  letter-spacing:0.3px;
+}
+.app-content.locked { display:none; }
 </style>
 </head>
 <body class="lang-ru">
+
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="pw-brand">GRAN<em>A</em>T</div>
+  <div class="pw-subtitle">The Living Document</div>
+  <input type="password" id="pw-input" placeholder="Enter password" autofocus>
+  <div class="pw-hint">Team access only</div>
+</div>
+
+<div class="app-content locked">
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <nav>
@@ -4080,6 +4122,40 @@ window.addEventListener('load', function() {
     }
   });
 });
+
+// ═══ PASSWORD GATE ═══
+(function(){
+  var HASH = '7f9c4cab'; // simple hash of "Granat"
+  function simpleHash(s) {
+    for(var h=0,i=0;i<s.length;i++) h=((h<<5)-h)+s.charCodeAt(i), h|=0;
+    return (h>>>0).toString(16);
+  }
+  var gate = document.getElementById('pw-gate');
+  var input = document.getElementById('pw-input');
+  var content = document.querySelector('.app-content');
+
+  // check if already authenticated
+  if (sessionStorage.getItem('granat-auth') === '1') {
+    gate.classList.add('hidden');
+    content.classList.remove('locked');
+  }
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      if (simpleHash(input.value) === HASH) {
+        sessionStorage.setItem('granat-auth', '1');
+        gate.classList.add('hidden');
+        content.classList.remove('locked');
+        observeReveals();
+      } else {
+        input.classList.add('error');
+        input.value = '';
+        setTimeout(function(){ input.classList.remove('error'); }, 400);
+      }
+    }
+  });
+})();
 </script>
+</div><!-- /app-content -->
 </body>
 </html>
