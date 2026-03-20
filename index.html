@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRANAT — Vision Alignment / Выравнивание Видения</title>
+<title>GRANAT — The Living Document / Живой Документ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&subset=cyrillic,latin&display=swap" rel="stylesheet">
 <style>
@@ -102,8 +102,27 @@ nav {
   padding:0.7rem 1.1rem; cursor:pointer; transition:all 0.25s;
   border-bottom:2px solid transparent; white-space:nowrap;
 }
+.tab-btn { position:relative; }
 .tab-btn:hover { color:var(--text-secondary); }
 .tab-btn.active { color:var(--crimson); border-bottom-color:var(--crimson); }
+.tab-badge {
+  position:absolute; top:4px; right:2px;
+  font-size:0.45rem; font-weight:700; letter-spacing:0.5px;
+  text-transform:uppercase; line-height:1;
+  padding:1.5px 4px; border-radius:3px;
+}
+.tab-badge.new {
+  background:var(--teal); color:#fff;
+}
+.tab-badge.updated {
+  background:var(--gold); color:#fff;
+}
+.tab-updated-at {
+  display:inline-block; font-size:0.6rem; color:var(--text-muted);
+  font-weight:500; letter-spacing:0.3px; margin-left:0.5rem;
+  padding:0.15rem 0.5rem; border-radius:4px;
+  background:rgba(0,0,0,0.03); border:1px solid var(--border-subtle);
+}
 
 /* TAB CONTENT */
 .tab-content { display:none; padding:7.5rem 2rem 4rem; min-height:100vh; }
@@ -393,8 +412,8 @@ nav {
   </div>
   <div class="nav-right">
     <span class="nav-doc-label">
-      <span class="en">Vision Alignment</span>
-      <span class="ru">Выравнивание Видения</span>
+      <span class="en">The Living Document</span>
+      <span class="ru">Живой Документ</span>
     </span>
     <div class="lang-toggle">
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
@@ -427,12 +446,15 @@ nav {
   </button>
   <button class="tab-btn" data-tab="sound" onclick="switchTab('sound')">
     <span class="en">Sound Architecture</span><span class="ru">Звуковая Архитектура</span>
+    <span class="tab-badge new">new</span>
   </button>
   <button class="tab-btn" data-tab="cr" onclick="switchTab('cr')">
-    <span class="en">CR Strategy v2</span><span class="ru">Стратегия CR v2</span>
+    <span class="en">CR Strategy</span><span class="ru">Стратегия CR</span>
+    <span class="tab-badge updated">v2</span>
   </button>
   <button class="tab-btn" data-tab="archetypes" onclick="switchTab('archetypes')">
     <span class="en">Voice Archetypes</span><span class="ru">Голосовые Архетипы</span>
+    <span class="tab-badge new">new</span>
   </button>
 </div>
 
@@ -2528,6 +2550,7 @@ nav {
   <p class="section-subtitle">
     <span class="en">March 17-18, 2026 | For: OA Olga, GMT, Alex Berez, Leo, Hector | Prepared by Cone Red (Dima Levin)</span>
     <span class="ru">17-18 марта 2026 | Для: OA Ольга, Ярослав, Саша, Лео, Гектор | Подготовлено Cone Red (Дима Левин)</span>
+    <span class="tab-updated-at"><span class="en">Added Mar 19</span><span class="ru">Добавлено 19 мар</span></span>
   </p>
 </div>
 
@@ -2882,6 +2905,7 @@ nav {
   <p class="section-subtitle">
     <span class="en">March 20, 2026 | Refined after Conny 5.0 review + IL meetings | For: GMT, OA, Alex, CR Team</span>
     <span class="ru">20 марта 2026 | Уточнено после ревью Conny 5.0 + встреч с ИЛ | Для: GMT, OA, Alex, CR Team</span>
+    <span class="tab-updated-at"><span class="en">Updated Mar 20</span><span class="ru">Обновлено 20 мар</span></span>
   </p>
 </div>
 
@@ -3441,6 +3465,7 @@ nav {
   <p class="section-subtitle">
     <span class="en">Deep research validating the archetype approach &mdash; March 20, 2026 | By: Dima Levin</span>
     <span class="ru">Глубокое исследование, подтверждающее архетипный подход &mdash; 20 марта 2026 | Автор: Дима Левин</span>
+    <span class="tab-updated-at"><span class="en">Added Mar 20</span><span class="ru">Добавлено 20 мар</span></span>
   </p>
 </div>
 
@@ -3970,9 +3995,13 @@ nav {
      ═══════════════════════════════════════════ -->
 <footer style="background:var(--bg-void);border-top:1px solid var(--border-subtle);color:var(--text-muted);text-align:center;padding:2rem;font-size:0.65rem;letter-spacing:0.5px;">
   <strong>GRANAT</strong> &mdash;
-  <span class="en">Vision Alignment Document</span>
-  <span class="ru">Документ выравнивания видения</span>
-  | March 16, 2026 | <span class="en">Internal &amp; Confidential</span><span class="ru">Внутренний и конфиденциальный</span>
+  <span class="en">The Living Document &mdash; Growing With the Project</span>
+  <span class="ru">Живой Документ &mdash; Растёт Вместе с Проектом</span>
+  <br>
+  <span style="font-size:0.55rem;opacity:0.7;">
+    <span class="en">Started Mar 16, 2026 | Last updated Mar 20, 2026 | Internal &amp; Confidential</span>
+    <span class="ru">Начат 16 мар 2026 | Последнее обновление 20 мар 2026 | Внутренний и конфиденциальный</span>
+  </span>
 </footer>
 
 <script>
