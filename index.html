@@ -123,6 +123,24 @@ nav {
   padding:0.15rem 0.5rem; border-radius:4px;
   background:rgba(0,0,0,0.03); border:1px solid var(--border-subtle);
 }
+.date-stamp {
+  display:block; margin-top:1.2rem; margin-bottom:0.5rem;
+}
+.date-stamp-inner {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.35rem 0.8rem; border-radius:6px;
+  background:rgba(155,27,48,0.04); border:1px solid rgba(155,27,48,0.12);
+  font-size:0.62rem; font-weight:600; letter-spacing:0.5px;
+  color:var(--crimson); text-transform:uppercase;
+}
+.date-stamp-inner .date-icon { font-size:0.7rem; opacity:0.6; }
+.date-stamp-inner .date-val { font-family:'JetBrains Mono','Inter',monospace; font-weight:700; }
+.tab-btn .tab-date {
+  display:block; font-size:0.42rem; font-weight:500;
+  color:var(--text-muted); letter-spacing:0.3px;
+  margin-top:1px; opacity:0.7;
+}
+.tab-btn.active .tab-date { color:var(--crimson); opacity:0.6; }
 
 /* TAB CONTENT */
 .tab-content { display:none; padding:7.5rem 2rem 4rem; min-height:100vh; }
@@ -467,35 +485,45 @@ nav {
 <div class="tab-bar" id="tabBar">
   <button class="tab-btn active" data-tab="vision" onclick="switchTab('vision')">
     <span class="en">Shared Vision</span><span class="ru">Общее Видение</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="gmt" onclick="switchTab('gmt')">
     <span class="en">GMT &amp; Olga</span><span class="ru">Ярослав и Ольга</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="alex" onclick="switchTab('alex')">
     <span class="en">Alex</span><span class="ru">Саша</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="bob" onclick="switchTab('bob')">
     <span class="en">Bob</span><span class="ru">Лёва</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="ilya" onclick="switchTab('ilya')">
     <span class="en">Ilya</span><span class="ru">Илья</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="dima" onclick="switchTab('dima')">
     <span class="en">Dima</span><span class="ru">Дима</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="full" onclick="switchTab('full')">
     <span class="en">Full Document</span><span class="ru">Полный документ</span>
+    <span class="tab-date">Mar 16</span>
   </button>
   <button class="tab-btn" data-tab="sound" onclick="switchTab('sound')">
     <span class="en">Sound Architecture</span><span class="ru">Звуковая Архитектура</span>
+    <span class="tab-date">Mar 19</span>
     <span class="tab-badge new">new</span>
   </button>
   <button class="tab-btn" data-tab="cr" onclick="switchTab('cr')">
     <span class="en">CR Strategy</span><span class="ru">Стратегия CR</span>
+    <span class="tab-date">Mar 20</span>
     <span class="tab-badge updated">v2</span>
   </button>
   <button class="tab-btn" data-tab="archetypes" onclick="switchTab('archetypes')">
     <span class="en">Voice Archetypes</span><span class="ru">Голосовые Архетипы</span>
+    <span class="tab-date">Mar 20</span>
     <span class="tab-badge new">new</span>
   </button>
 </div>
@@ -518,6 +546,7 @@ nav {
     <span class="en">March 15, 2026 call achieved three critical outcomes: separation of demo from R&D, introduction of Olga as strategic lead, and crystallization of Alex's Three Pillars framework.</span>
     <span class="ru">Звонок 15 марта 2026 достиг трёх ключевых результатов: разделение демо и R&D, введение Ольги как стратегического лидера, кристаллизация фреймворка «Три Столпа» Саши.</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <div class="callout teal reveal">
@@ -857,6 +886,7 @@ nav {
     <span class="en">Everything from March 15 that matters for the two of you — the tree, the demo direction, the new colors, and your next steps.</span>
     <span class="ru">Всё с 15 марта, что важно для вас двоих — дерево, направление демо, новые цвета и ваши следующие шаги.</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <!-- WHAT THEY ASKED FOR -->
@@ -1067,6 +1097,7 @@ nav {
     <span class="en">Your Three Pillars became the backbone. Here's the full detail on each, plus your idea inventory and open questions.</span>
     <span class="ru">Ваши Три Столпа стали хребтом. Вот полные детали по каждому, плюс инвентаризация идей и открытые вопросы.</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <div class="quote-block reveal">
@@ -1431,6 +1462,7 @@ nav {
     <span class="en">Lev, here's the full picture: sprint status, priorities, quality observations, and governance setup. Today we have our core team meeting — let's use it to lock in the control environment.</span>
     <span class="ru">Лёв, вот полная картина: статус спринта, приоритеты, наблюдения по качеству и настройка управления. Сегодня у нас встреча с ядром команды — давай используем её для закрепления контрольной среды.</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <div class="divider"></div>
@@ -1647,6 +1679,7 @@ nav {
     <span class="en">Ilya, your ear is critical for everything we're building. Here's your scope, the song requirements, and where I need you most. Today at 16:30 CET we have the call with Ilya Lukashev — big day!</span>
     <span class="ru">Илья, твой слух — критичен для всего, что мы строим. Вот твой объём работ, требования к песне и где ты нужен больше всего. Сегодня в 16:30 CET у нас звонок с Ильёй Лукашевым — важный день!</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <div class="divider"></div>
@@ -1851,6 +1884,7 @@ nav {
     <span class="en">Full transparency on my commitments, approach, and timeline. Two independent workstreams, no vinaigrette.</span>
     <span class="ru">Полная прозрачность по моим обязательствам, подходу и срокам. Два независимых потока работы, без винегрета.</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
 </div>
 
 <!-- Two Workstreams -->
@@ -2318,6 +2352,7 @@ nav {
     <span class="en">Date: March 16, 2026 | Source: Vision Alignment Call (March 15, 2026) | Prepared by: Conny 5.0 (Strategy)</span>
     <span class="ru">Дата: 16 марта 2026 | Источник: Звонок по выравниванию видения (15 марта 2026) | Подготовил: Conny 5.0 (Стратегия)</span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Created</span><span class="ru">Создано</span> <span class="date-val">Mar 16, 2026</span></span></div>
   <p style="font-size:0.8rem;color:var(--text-muted);">
     <span class="en">Participants: GMT (Moshe/Yaroslav), Olga (OA), Alex Berezovsky (AB), Dima Levin, Hector Cryo (Ilya), Bob Lev</span>
     <span class="ru">Участники: GMT (Моше/Ярослав), Ольга (ОА), Алекс Березовский (АБ), Дима Левин, Гектор Крио (Илья), Боб Лев</span>
@@ -2592,8 +2627,8 @@ nav {
   <p class="section-subtitle">
     <span class="en">March 17-18, 2026 | For: OA Olga, GMT, Alex Berez, Leo, Hector | Prepared by Cone Red (Dima Levin)</span>
     <span class="ru">17-18 марта 2026 | Для: OA Ольга, Ярослав, Саша, Лео, Гектор | Подготовлено Cone Red (Дима Левин)</span>
-    <span class="tab-updated-at"><span class="en">Added Mar 19</span><span class="ru">Добавлено 19 мар</span></span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Added</span><span class="ru">Добавлено</span> <span class="date-val">Mar 19, 2026</span></span></div>
 </div>
 
 <!-- What Happened -->
@@ -2947,8 +2982,8 @@ nav {
   <p class="section-subtitle">
     <span class="en">March 20, 2026 | Refined after Conny 5.0 review + IL meetings | For: GMT, OA, Alex, CR Team</span>
     <span class="ru">20 марта 2026 | Уточнено после ревью Conny 5.0 + встреч с ИЛ | Для: GMT, OA, Alex, CR Team</span>
-    <span class="tab-updated-at"><span class="en">Updated Mar 20</span><span class="ru">Обновлено 20 мар</span></span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Updated</span><span class="ru">Обновлено</span> <span class="date-val">Mar 20, 2026</span> <span style="opacity:0.5;font-size:0.9em;">(v2)</span></span></div>
 </div>
 
 <!-- Stakeholder Framing -->
@@ -3507,8 +3542,8 @@ nav {
   <p class="section-subtitle">
     <span class="en">Deep research validating the archetype approach &mdash; March 20, 2026 | By: Dima Levin</span>
     <span class="ru">Глубокое исследование, подтверждающее архетипный подход &mdash; 20 марта 2026 | Автор: Дима Левин</span>
-    <span class="tab-updated-at"><span class="en">Added Mar 20</span><span class="ru">Добавлено 20 мар</span></span>
   </p>
+  <div class="date-stamp"><span class="date-stamp-inner"><span class="date-icon">◆</span> <span class="en">Added</span><span class="ru">Добавлено</span> <span class="date-val">Mar 20, 2026</span></span></div>
 </div>
 
 <!-- HERO INSIGHT -->
